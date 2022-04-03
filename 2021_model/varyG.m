@@ -42,7 +42,8 @@ Ts = Csa_u*Csa_l;
 Tp = Rp*Cpa;
 Csa = Csa_u+Csa_l;
 
-P_thorax = linspace(-4*1333,4*1333, 9); %mmHg * dynes/(mmHg*cm^2)
+%P_thorax = linspace(-4*1333,4*1333, 9); %mmHg * dynes/(mmHg*cm^2)
+P_thorax = -4*1333;
 P_RA = P_thorax+dP_RA;
 
 Vd_total_vec = zeros(1,length(G)); 
@@ -105,7 +106,7 @@ for j = 1:length(P_thorax)
         sol_Ppa_Pthorax_G(j,:) = Ppa_vec;
 end
 
-
+consistency(
 %family of plots for Reserve Volume vs. G for different Pthorax values: 
 % 
 % figure(100)
