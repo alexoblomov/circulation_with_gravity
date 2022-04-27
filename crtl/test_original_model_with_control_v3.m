@@ -1,5 +1,5 @@
 %% Original model controller
-
+% version without Q. not working
 % FOR NOW JUST TRYING TO GET CASE I working, although the same controller%%
 % works when the systemic venous pressure is non zero because it adds a  %%
 % constant term that dissapears in the differentiation we use to get the %%

@@ -1,7 +1,7 @@
 %% Original model controller
 %% parameters
 simulate = "case 1";
-lambda = 0;
+lambda = 100000;
 % mmHs/(Liters/min)
     Rs = 17.86 ; % systemic resistance 
     Rp = 1.61; % pulmonary resistance
@@ -48,12 +48,19 @@ Psa_star = 100;  % mmHG
         ((Psa_star*g0(4))/(g0(3)*Vstroke_star))^lambda-(g1(5)/F_star);... f5
         ];
     % the jacobian of the system
-    J = @(g0)[-1,-1/(T+(alpha+(Csa+Csv)/CRVD)/g0(5)),0,0,(Beta*((VT-g0(2))-(Csa+Csv)*Pthorax))/(g0(5)*T+Beta)^2;...df1
-        0,-1,lambda*T/Rs,lambda*alpha,0;...df2
-        0,0,-1,Rs*g0(5),Rs*g0(4);...df3
-        0,-1/(g0(5)*T+alpha),0,-1,(T*(g0(2)-VT))/(g0(5)*T+alpha)^2;... df4
-        0,0,lambda*((-Psa_star*g0(4))/(Vstroke_star*g0(3)^2))^(lambda-1),...
-        lambda*(Psa_star/(g0(3)*Vstroke_star))^(lambda-1),-1/F_star];
+%     J = @(g0)[-1,-1/(T+(alpha+(Csa+Csv)/CRVD)/g0(5)),0,0,(Beta*((VT-g0(2))-(Csa+Csv)*Pthorax))/(g0(5)*T+Beta)^2;...df1
+%         0,-1,lambda*T/Rs,lambda*alpha,0;...df2
+%         0,0,-1,Rs*g0(5),Rs*g0(4);...df3
+%         0,-1/(g0(5)*T+alpha),0,-1,(T*(g0(2)-VT))/(g0(5)*T+alpha)^2;... df4
+%         0,0,lambda*((-Psa_star*g0(4))/(Vstroke_star*g0(3)^2))^(lambda-1),...
+%         lambda*(Psa_star/(g0(3)*Vstroke_star))^(lambda-1),-1/F_star];
+    %transpose
+    J = @(g0)[-1, 0, 0, 0,0;...
+        -1/(T+(alpha+(Csa+Csv)/CRVD)/g0(5)), -1, 0, -1/(g0(5)*T+alpha), 0;...
+        0, lambda*T/Rs, -1, 0, lambda*((-Psa_star*g0(4))/(Vstroke_star*g0(3)^2))^(lambda-1); ...
+        0, lambda*alpha, Rs*g0(5), -1, lambda*(Psa_star/(g0(3)*Vstroke_star))^(lambda-1);
+        (Beta*((VT-g0(2))-(Csa+Csv)*Pthorax))/(g0(5)*T+Beta)^2, 0, Rs*g0(4), (T*(g0(2)-VT))/(g0(5)*T+alpha)^2, lambda*(Psa_star/(g0(3)*Vstroke_star))^(lambda-1),-1/F_star];
+         
     
     % we choose the initial guess to be close to the steady state values
     a = 0.8; b =1.2;
