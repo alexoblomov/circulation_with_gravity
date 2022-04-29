@@ -3,8 +3,8 @@ close all
 
 Psa_u_star = 100*1333; %dynes/cm^2
 Psa_u = Psa_u_star; 
-dP_RA = 2*1333;
-%P_RA = P_thorax+dP_RA
+dP_RA_star = 2*1333;
+
 
 height = 172; %cm
 Hu = (1/(3*2))*height;%upper  
@@ -42,16 +42,73 @@ Ts = Csa_u*Csa_l;
 Tp = Rp*Cpa;
 Csa = Csa_u+Csa_l;
 
-P_thorax = [-4*1333:5:15*1333] ; %mmHg * dynes/(mmHg*cm^2)
-P_RA = P_thorax+dP_RA;
+P_thorax = [-4*1333:9:4*1333] ; %mmHg * dynes/(mmHg*cm^2)
+P_RA = P_thorax+dP_RA_star;
 
 g_earth = 980; %gravitational acceleration cm/s^2
 G = [980:980:2*980]; %cm/s^2
 
 Vd_total_vec = zeros(1,length(P_thorax)); 
 sol_Vd_G_Pthorax = zeros(length(G), length(P_thorax)); 
+valid_dPRA_vs_G_Pthorax = zeros(length(G), length(Pthorax));
+
+
+for i = 1:length(G)
+     for j = 1:length(P_thorax)
+         if P_thorax(j) <= -dPRA_star %CASE 1
+             
+            Vd_total = Vtotal - Cp*(C_RVD/C_LVD)*(dPRA_star) - ...
+            (Tp*Gs+Csa)*Psa_u_star - (Tp*Gs_l+Csa_l)*rho*G(i)*Hu...
+            - Cs_l*rho*G(i)*(-Hl);
+             if Vd_total <= 0
+             Vd_total = 0; 
+             dPRA = (C_LVD/(C_RVD*Cp))*(-(Tp*Gs+Csa)*(Psa_u_star)...
+                 -(Tp*Gs_l+Csa_l)*rho*G(i)*Hu+Cs_l*rho*G(i)*Hl+Vtotal);
+         
+             elseif Vd_total > 0 
+                 dPRA = dPRA_star; 
+             end
+         elseif P_thorax(j) > -dPRA_star && P_thorax(j) < rho*G(i)*Hu - dPRA_star %CASE 2
+            
+            Vd_total = Vtotal - Cp*(C_RVD/C_LVD)*dPRA - ...
+            (Tp*Gs+Csa)*Psa_u_star - (Tp*Gs_l+Csa_l)*rho*G(i)*Hu ...
+            - Cs_l*rho*G(i)*(-Hl) - (Csv_l-Tp*Gs_l)*(P_thorax(j)+dPRA);
+             if Vd_total <= 0
+             Vd_total = 0; 
+             dPRA = (C_LVD/(Cp*C_RVD+Csv_l-Tp*Gs_l))*(Vtotal-Vd_total...
+                 -(Tp*Gs+Csa)*(Psa_u_star) - (Tp*Gs_l+Csa_l)*rho*G(i)*Hu...
+                 + Cs_l*rho*G(i)*Hl - (Csv_l-Tp*Gs_l)*P_thorax(j));
+             elseif Vd_total > 0 
+                 dPRA = dPRA_star; 
+             
+             end
+         elseif P_thorax(j) >= rho*G(i)*Hu - dPRA_star %CASE 3
+            
+            Vd_total = Vtotal - Cp*(C_RVD/C_LVD)*dPRA ...
+            - (Tp*Gs+Csa)*Psa_u_star - (Tp*Gs+Csa_l-Csv_u)*rho*G(i)*Hu...
+            - Cs_l*rho*G(i)*(-Hl) - (Csv_l-Tp*Gs)*(P_thorax(j)+dPRA);
+             if Vd_total <= 0
+             Vd_total = 0; 
+             dPRA = (C_LVD/(Cp*C_RVD+P_thorax(j)*(Csv-Tp*Gs)))...
+                 *(Vtotal-Vd_total-(Tp*Gs+Csa)*Psa_u_star-...
+                 (Tp*Gs+Csa_l-Csv_u)*rho*G(i)*Hu+...
+                 Cs_l*rho*G(i)*Hl); 
+             elseif Vd_total > 0 
+                 dPRA = dPRA_star; 
+             end
+         end
+         Vd_total_vec(j) = Vd_total;
+         dPRA_vec(j) = dPRA; 
+     end
+     sol_Vd_G_Pthorax(i,:) = Vd_total_vec; 
+     valid_dPRA_vs_G_Pthorax(i,:) = dPRA_vec;
+ end
+ 
+               
+
 for i = 1:length(G)
     for j = 1:length(P_thorax)
+        
         if P_thorax(j) <= -dP_RA %CASE 1
             Vd_total = Vtotal - Cp*(C_RVD/C_LVD)*(dP_RA) - ...
             (Tp*Gs+Csa)*Psa_u_star - (Tp*Gs_l+Csa_l)*rho*G(i)*Hu...
