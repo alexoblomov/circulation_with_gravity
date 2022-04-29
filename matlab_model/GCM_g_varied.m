@@ -105,17 +105,17 @@ if (simulate == "case 1")
     % equations
     b = [VT-VT0+rho*g*H_lower*(Csa_U+Csv_L);...
         rho*g*H_upper];
-    A = [K+Csa_U*Rs_U,K+Csa_L*Rs_L;-Rs_U Rs_L];
+    A = [K+Csa_U*Rs_U, -Rs_U; K+Csa_L*Rs_L, Rs_L]; 
 elseif (simulate == "case 2")
     Pthorax = 16.32 * mmh_to_dynes; % This is the constant value of the pressure in the thorax we use for case II.
     % This is picked as the median value in the range of values of Pthorax
     % for which case II is satistied
     
     % equations
-    b = [VT-VT0-(Csa_U+Csv_L)-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
+    b = [VT-VT0-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
         rho*g*H_upper-Pthorax];
-    A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD),K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD);...
-        1/(F*CRVD)-Rs_U Rs_L-1/(F*CRVD)]; 
+    A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD), 1/(F*CRVD)-Rs_U ;...
+         K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD), Rs_L-1/(F*CRVD)];
 elseif (simulate == "case 3")
     %Pthorax = 71;
     Pthorax = 53.82 * mmh_to_dynes; % This is the constant value of the pressure in the thorax we use for case III
@@ -123,10 +123,11 @@ elseif (simulate == "case 3")
     % for which case III is satistied
     
     % equations
-      b = [VT-VT0-(Csa_L+Csv_L)*(Pthorax-rho*g*H_lower)-...
+    b = [VT-VT0-(Csa_L+Csv_L)*(Pthorax-rho*g*H_lower)-...
           (Csa_U+Csv_U)*(Pthorax-rho*g*H_upper);0];
-      A = [K+Csa_U*Rs_U+(Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD),...
-          K+Csa_L*Rs_L+(Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD);-Rs_U Rs_L];
+    A = [Csa_U*Rs_U+ Cpa*Rp+ alpha/F + (Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD),...
+         -Rs_U;...
+         Csa_L*Rs_L+ alpha/F + (Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD), Rs_L];
 end
 
 % we solve:

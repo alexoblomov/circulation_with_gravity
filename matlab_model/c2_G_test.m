@@ -113,10 +113,10 @@ K = Cpa*Rp+(Cpa+Cpv)/(F*CLVD); % constant term present in each of the three case
     % for which case II is satistied
     
     % equations
-    b = [VT-VT0-(Csa_U+Csv_L)-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
+    b = [VT-VT0-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
         rho*g*H_upper-Pthorax];
-    A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD),K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD);...
-        1/(F*CRVD)-Rs_U Rs_L-1/(F*CRVD)];
+    A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD), 1/(F*CRVD)-Rs_U ;...
+         K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD), Rs_L-1/(F*CRVD)];
 % we solve:
 Q = A\b;
 %% I. upper and lower flows (Q_U and Q_L)
@@ -244,20 +244,20 @@ p2 = plot(solutions(1,:,1,1)./100,pressures(1,:,1,1),'LineWidth',2,'Color',C(1,:
 p3 = plot(solutions(1,:,1,1)./100,pressures(1,:,4,1),'LineWidth',2,'Color',C(4,:)); %Psa_L v BV
 p4 = plot(solutions(1,:,1,1)./100,pressures(1,:,2,1),'LineWidth',2,'Color',C(2,:)); %Psv_L v BV
 
-% line labels
-label(p3,'lower systemic arterial','location','right',...
-    'verticalalignment','bottom','fontweight','bold')
-label(p4,'lower systemic venous','location','right',...
-    'verticalalignment','bottom','fontweight','bold')
-
-label(p1,'upper systemic arterial','location','right',...
-    'verticalalignment','bottom','fontweight','bold')
-label(p2,'upper systemic venous','location','right',...
-    'verticalalignment','bottom','fontweight','bold')
-% graph labels
-title('Pressure vs g')
-ylabel('Pressure (dynes/cm^2)')
-xlabel('distance from surface (m)')
-set(gca, 'Ticklength', [0 0])
-xticklabels(earth_distances)
+% % line labels
+% label(p3,'lower systemic arterial','location','right',...
+%     'verticalalignment','bottom','fontweight','bold')
+% label(p4,'lower systemic venous','location','right',...
+%     'verticalalignment','bottom','fontweight','bold')
+% 
+% label(p1,'upper systemic arterial','location','right',...
+%     'verticalalignment','bottom','fontweight','bold')
+% label(p2,'upper systemic venous','location','right',...
+%     'verticalalignment','bottom','fontweight','bold')
+% % graph labels
+% title('Pressure vs g')
+% ylabel('Pressure (dynes/cm^2)')
+% xlabel('distance from surface (m)')
+% set(gca, 'Ticklength', [0 0])
+% xticklabels(earth_distances)
 hold off
