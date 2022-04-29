@@ -139,26 +139,49 @@ for i= 1:length(Pthorax_range)
     Vpv0 = Vpv0_original * L_to_cm3;
     VT0 = Vsa0_U + Vsa0_L + Vsv0_U + Vsv0_L + Vpa0 + Vpv0;
 %% Cases
+%% wrong row column order in A. uncomment to get plots that are currently in draft
+% K = Cpa*Rp+(Cpa+Cpv)/(F*CLVD); % constant term present in each of the three cases
+% if (simulate == "case 1")
+%     % equations
+%     b = [VT-VT0+rho*g*H_lower*(Csa_U+Csv_L);...
+%         rho*g*H_upper];
+%     A = [K+Csa_U*Rs_U,K+Csa_L*Rs_L;-Rs_U Rs_L]; 
+% elseif (simulate == "case 2")
+%     % equations
+%     b = [VT-VT0-(Csa_U+Csv_L)-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
+%         rho*g*H_upper-Pthorax];
+%     A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD),K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD);...
+%         1/(F*CRVD)-Rs_U Rs_L-1/(F*CRVD)];
+% elseif (simulate == "case 3")
+%     % equations
+%       b = [VT-VT0-(Csa_L+Csv_L)*(Pthorax-rho*g*H_lower)-...
+%           (Csa_U+Csv_U)*(Pthorax-rho*g*H_upper);0];
+%       A = [K+Csa_U*Rs_U+(Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD),...
+%           K+Csa_L*Rs_L+(Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD);-Rs_U Rs_L];
+% end
+%% correct row column orders. very different plots
 K = Cpa*Rp+(Cpa+Cpv)/(F*CLVD); % constant term present in each of the three cases
-if (simulate == "case 1")
+alpha = (Cpa+Cpv)/CLVD;
+dPra = Pra-Pthorax;
+if Pthorax <= -dPra %CASE 1
     % equations
     b = [VT-VT0+rho*g*H_lower*(Csa_U+Csv_L);...
         rho*g*H_upper];
-    A = [K+Csa_U*Rs_U,K+Csa_L*Rs_L;-Rs_U Rs_L]; 
-elseif (simulate == "case 2")
+    A = [K+Csa_U*Rs_U, -Rs_U; K+Csa_L*Rs_L, Rs_L]; 
+elseif Pthorax > (-dPra && Pthorax) < (rho*g*H_upper - dPra) %CASE 2
     % equations
-    b = [VT-VT0-(Csa_U+Csv_L)-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
+    b = [VT-VT0-(Pthorax-rho*g*H_lower)*(Csv_L+Csa_L);...
         rho*g*H_upper-Pthorax];
-    A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD),K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD);...
-        1/(F*CRVD)-Rs_U Rs_L-1/(F*CRVD)];
-elseif (simulate == "case 3")
+    A = [K+Csa_U*Rs_U+(Csa_L+Csv_L)/(F*CRVD), 1/(F*CRVD)-Rs_U ;...
+         K+Csa_L*Rs_L+(Csa_L+Csv_L)/(F*CRVD), Rs_L-1/(F*CRVD)];
+elseif  Pthorax >= (rho*g*H_upper - dPra)
     % equations
       b = [VT-VT0-(Csa_L+Csv_L)*(Pthorax-rho*g*H_lower)-...
           (Csa_U+Csv_U)*(Pthorax-rho*g*H_upper);0];
-      A = [K+Csa_U*Rs_U+(Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD),...
-          K+Csa_L*Rs_L+(Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD);-Rs_U Rs_L];
+      A = [Csa_U*Rs_U+ Cpa*Rp+ alpha/F + (Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD),...
+          -Rs_U;...
+           Csa_L*Rs_L+ alpha/F + (Csa_U+Csa_L+Csv_U+Csv_L)/(F*CRVD), Rs_L];
 end
-
 % we solve:
 Q = A\b;
 %% I. upper and lower flows (Q_U and Q_L)
