@@ -38,7 +38,7 @@ Vtotal = 5.0*1000; %cm^3
 Csa = Csa_l+Csa_u;
 Gs = 1/Rs_u + 1/Rs_l; 
 Gs_l = 1/Rs_l;
-Ts = Csa_u*Csa_l;
+Ts = Csa_u*Rs_u; %Csa_l*Rs_l;
 Tp = Rp*Cpa;
 Csa = Csa_u+Csa_l;
 
