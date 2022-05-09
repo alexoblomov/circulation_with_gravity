@@ -5,15 +5,15 @@ Psa_u_star = 100*1333; %mmHg * [ dynes/(mmHg*cm^2) ]
 Psa_u = Psa_u_star; 
 dP_RA = 2*1333;
 
-height = 172; %cm
-Hu = (1/(3*2))*height;%upper  
-Hl = -(2/(3*2))*height;%lower
+height = 167.64; %cm
+Hu = 0.5*32;%cm %upper  
+Hl = -(42/2);%cm %lower
 
 rho = 1; %g/cm^3
 g_earth = 980; %gravitational acceleration cm/s^2
 G = linspace(980,980*10, 10000); %cm/s^2
 
-Rs = (17.86)*1333/(1000/60); %systemic resistance (mmHg/(liters/s))
+Rs = (16.49)*1333/(1000/60); %default 17.86, 16.49-20.02 (too high) systemic resistance (mmHg/(liters/s))
 Gs = 1/Rs;
 Gs_u = (1/3)*Gs;
 Gs_l = (2/3)*Gs; 
@@ -33,7 +33,7 @@ Cs_l = Csa_l + Csv_l;
 Cpa = (0.00412/1333)*1000; 
 Cpv = (0.01/1333)*1000; 
 Cp = Cpa + Cpv;
-Vtotal = 5.0*1000; %cm^3
+Vtotal = 3.7*1000; %cm^3
 
 Csa = Csa_l+Csa_u;
 Gs = 1/Rs_u + 1/Rs_l; 
@@ -117,57 +117,92 @@ for j = 1:length(P_thorax)
 end
 
 %conversions:
-G = G/100; 
+G = G/100/(g_earth/100); 
 sol_Q_Pthorax_G = sol_Q_Pthorax_G*60/1000; 
 sol_F_Pthorax_G = sol_F_Pthorax_G*60;
 sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G/1333;
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G/1000;
 
+%%% PLOT OPTIONS %%%
+ 
+%%plot(x, y,myLineColorPref,'color', myLineColorVec,'LineWidth', myLineWidth) %buffer times in black
+myLineColorPref="k-"; %black line
+myLineColorVec = [0,0,0]; %black -> shades of gray
+myLineWidth = 1;
+myLabelFontSize=18;
+alpha=0.1; %increment for gray
+beta=1;
+
+%label_P_thorax = num2str([-3:4]'); %in mm Hg, from -3 to 4
+
+%% saveas(h_overlay_nonDM, myPlotOverlay_nonDM, 'pdf')
+%set(gca, 'FontSize', myLabelFontSize)
+%print(myfig,figName,"-dpdf", "-S4016,2362")
+              
 
 %family of plots for Reserve Volume vs. G for different Pthorax values: 
 % 
-figure(100)
-for i = 1:length(P_thorax)
+h=figure(100)
+clf(100)
 
-plot(G,sol_Vd_Pthorax_G(i,:))
-xlabel('G, m/s$^2$', 'interpreter', 'latex')
-ylabel('V$^0$, (L)', 'interpreter', 'latex')
 hold on
-end
+
+    for i = 1:length(P_thorax)
+        myLineColor=myLineColorVec+alpha*(i-1); %set grayscale
+        %myLineWidthPlot=myLineWidth+beta*(i-1); %set linewidth
+        myLineWidthPlot=myLineWidth; %do not vary line width
+        plot(G,sol_Vd_Pthorax_G(i,:),myLineColorPref,'color', myLineColor,'LineWidth', myLineWidthPlot)
+    end
+
+    xlabel('G')
+    ylabel('Reserve Volume (L)')
+    set(gca, 'FontSize', myLabelFontSize)
+    
+hold off
+
+saveas(h, "QvsV0", 'pdf')
+saveas(h, "QvsV0", 'png')
+
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
 
-figure(101)
+h1=figure(101)
+clf(101)
 for i = 1: length(P_thorax)
 
 plot(G,sol_Q_Pthorax_G(i,:))
-xlabel('G, m/s$^2$', 'interpreter', 'latex')
-ylabel('Q, (L/min)', 'interpreter', 'latex')
+xlabel('G', 'interpreter', 'latex')
+ylabel('Cardiac Output (L/min)', 'interpreter', 'latex')
 hold on
 end
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
 
 
-figure(102)
-for i = 1:length(P_thorax)
-
-plot(G,sol_F_Pthorax_G(i,:))
-xlabel('G, m/s$^2$', 'interpreter', 'latex')
-ylabel('F, (min$^{-1}$)', 'interpreter', 'latex')
+h2=figure(102)
+clf(102)
 hold on
-end
+    for i = 1:length(P_thorax)
+        myLineColor=myLineColorVec+alpha*(i-1); %set grayscale
+        plot(G,sol_F_Pthorax_G(i,:), myLineColorPref,'color', myLineColor,'LineWidth', myLineWidthPlot)
+    end
+hold off
+xlabel('G')
+ylabel('Heart Rate (per minute)')
+hold on
+
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
 
 
 
-figure(103)
+h3=figure(103)
+clf(103)
 for i = 1:length(P_thorax)
 
 plot(G,sol_Ppa_Pthorax_G(i,:))
-xlabel('G, m/s$^2$', 'interpreter', 'latex')
-ylabel('Ppa, mmHg', 'interpreter', 'latex')
+xlabel('G', 'interpreter', 'latex')
+ylabel('Pulmonary Arterial Pressure (mmHg)', 'interpreter', 'latex')
 hold on
 end
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
