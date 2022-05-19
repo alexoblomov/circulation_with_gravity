@@ -52,6 +52,9 @@ P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
 
 #P_thorax = -4*1333;
 P_RA = P_thorax + dP_RA
+
+cases = np.zeros((len(P_thorax),len(G)), dtype=np.uint8)
+
 Vd_total_vec = np.zeros(len(G))
 Q_vec = np.zeros(len(G))
 F_vec = np.zeros(len(G))
@@ -69,6 +72,7 @@ for j in range(len(P_thorax)):
             F = Q / (C_RVD * (P_RA[j] - P_thorax[j]))
             Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
             Ppa = Ppv + Q * Rp
+            cases[j, i] = 1
         else:
             if P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
                 Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
@@ -81,6 +85,7 @@ for j in range(len(P_thorax)):
                 F = Q / (C_RVD * (dP_RA))
                 Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
                 Ppa = Ppv + Q * Rp
+                cases[j, i] = 2
             else:
                 if P_thorax[j] >= rho * G[i] * Hu - dP_RA:
                     Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs + Csa_l - Csv_u) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs) * (P_thorax[j] + dP_RA)
@@ -93,6 +98,7 @@ for j in range(len(P_thorax)):
                     F = Q / (C_RVD * (dP_RA))
                     Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
                     Ppa = Ppv + Q * Rp
+                    cases[j, i] = 3
         if Vd_total > 0:
             Vd_total_vec[i] = Vd_total
             Q_vec[i] = Q
@@ -117,15 +123,15 @@ sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
 ### PLOT OPTIONS ###
 
 ##plot(x, y,myLineColorPref,'color', myLineColorVec,'LineWidth', myLineWidth) #buffer times in black
-myLineColorPref = 'k-'
-
-myLineColorVec = np.array([0,0,0])
-
-myLineWidth = 1
-myLabelFontSize = 18
-alpha = 0.1
-
-beta = 1
+# myLineColorPref = 'k-'
+#
+# myLineColorVec = np.array([0,0,0])
+#
+# myLineWidth = 1
+# myLabelFontSize = 18
+# alpha = 0.1
+#
+# beta = 1
 
 #family of plots for Reserve Volume vs. G for different Pthorax values:
 
@@ -144,7 +150,12 @@ for n, plt_title in enumerate(pthorax_titles):
     ax = plt.subplot(4, 2, n + 1)
 
     # filter df and plot ticker on the new subplot axis
+    idx_case_1 = cases == 1
+    idx_case_2 = cases == 2
+    idx_case_3 = cases == 3
     ax.plot(G,sol_Vd_Pthorax_G[n,:])
+    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_2],'g')
+    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_3],'b')
     # chart formatting
     ax.set_title(plt_title)
     # ax.get_legend().remove()
@@ -152,6 +163,8 @@ for n, plt_title in enumerate(pthorax_titles):
     ax.set_ylabel("VT0")
 # plt.show()
 plt.savefig("VT0_vs_g.png")
+
+#################### code needs to be adapted from here on #####################
 # h1 = plt.figure(101)
 # clf(101)
 # for i in np.arange(1,len(P_thorax)+1).reshape(-1):
