@@ -126,32 +126,32 @@ myLabelFontSize = 18
 alpha = 0.1
 
 beta = 1
-#label_P_thorax = num2str([-3:4]'); #in mm Hg, from -3 to 4
-
-## saveas(h_overlay_nonDM, myPlotOverlay_nonDM, 'pdf')
-#set(gca, 'FontSize', myLabelFontSize)
-#print(myfig,figName,"-dpdf", "-S4016,2362")
 
 #family of plots for Reserve Volume vs. G for different Pthorax values:
 
-h = plt.figure(100)
-plt.plot(G,sol_Vd_Pthorax_G[1,:])
-
-# for i in np.arange(1,len(P_thorax)+1).reshape(-1):
-#     myLineColor = myLineColorVec + alpha * (i - 1)
-#     #myLineWidthPlot=myLineWidth+beta*(i-1); #set linewidth
-#     myLineWidthPlot = myLineWidth
-#     plt.plot(G,sol_Vd_Pthorax_G[i,:])
-
-plt.xlabel('G')
-plt.ylabel('Reserve Volume (L)')
-# set(gca,'FontSize',myLabelFontSize)
-# saveas(h,'QvsV0','pdf')
-# saveas(h,'QvsV0','png')
-plt.show()
+# plt.show()
 # xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 # xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
 
+
+plt.figure(figsize=(15, 12))
+plt.subplots_adjust(hspace=0.5)
+plt.suptitle("Reserve volume vs g", fontsize=18, y=0.95)
+pthorax_titles = ["P thorax " + str(pth / 1333) + " mmHg" for pth in P_thorax]
+# loop through the length of tickers and keep track of index
+for n, plt_title in enumerate(pthorax_titles):
+    # add a new subplot iteratively
+    ax = plt.subplot(4, 2, n + 1)
+
+    # filter df and plot ticker on the new subplot axis
+    ax.plot(G,sol_Vd_Pthorax_G[n,:])
+    # chart formatting
+    ax.set_title(plt_title)
+    # ax.get_legend().remove()
+    ax.set_xlabel("g multiple")
+    ax.set_ylabel("VT0")
+# plt.show()
+plt.savefig("VT0_vs_g.png")
 # h1 = plt.figure(101)
 # clf(101)
 # for i in np.arange(1,len(P_thorax)+1).reshape(-1):
