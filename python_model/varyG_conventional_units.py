@@ -52,42 +52,46 @@ P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
 
 #P_thorax = -4*1333;
 P_RA = P_thorax + dP_RA
-Vd_total_vec = np.zeros((1,len(G)))
+Vd_total_vec = np.zeros(len(G))
+Q_vec = np.zeros(len(G))
+F_vec = np.zeros(len(G))
+Ppa_vec = np.zeros(len(G))
+
 sol_Vd_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_Q_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_F_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_Ppa_Pthorax_G = np.zeros((len(P_thorax),len(G)))
-for j in np.arange(1,len(P_thorax)+1).reshape(-1):
-    for i in np.arange(1,len(G)+1).reshape(-1):
-        if P_thorax(j) <= - dP_RA:
-            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * (dP_RA) - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G(i) * Hu - Cs_l * rho * G(i) * (- Hl)
-            Q = ((1 / Rs_u) + (1 / Rs_l)) * Psa_u_star + rho * G(i) * Hu / Rs_l
-            F = Q / (C_RVD * (P_RA(j) - P_thorax(j)))
-            Ppv = P_thorax(j) + (C_LVD / C_RVD) * dP_RA
+for j in range(len(P_thorax)):
+    for i in range(len(G)):
+        if P_thorax[j] <= - dP_RA:
+            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * (dP_RA) - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl)
+            Q = ((1 / Rs_u) + (1 / Rs_l)) * Psa_u_star + rho * G[i] * Hu / Rs_l
+            F = Q / (C_RVD * (P_RA[j] - P_thorax[j]))
+            Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
             Ppa = Ppv + Q * Rp
         else:
-            if P_thorax(j) > - dP_RA and P_thorax(j) < rho * G(i) * Hu - dP_RA:
-                Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G(i) * Hu - Cs_l * rho * G(i) * (- Hl) - (Csv_l - Tp * Gs_l) * (P_thorax(j) + dP_RA)
-                Psv_l = - rho * G(i) * Hl + P_thorax(j) + dP_RA
+            if P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
+                Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
+                Psv_l = - rho * G[i] * Hl + P_thorax[j] + dP_RA
                 Psv_u = 0
-                Psa_l = Psa_u_star + rho * G(i) * (Hu - Hl)
+                Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
                 Qs_u = Psa_u_star / Rs_u
                 Qs_l = (Psa_l - Psv_l) / Rs_l
                 Q = Qs_u + Qs_l
                 F = Q / (C_RVD * (dP_RA))
-                Ppv = P_thorax(j) + (C_LVD / C_RVD) * dP_RA
+                Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
                 Ppa = Ppv + Q * Rp
             else:
-                if P_thorax(j) >= rho * G(i) * Hu - dP_RA:
-                    Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs + Csa_l - Csv_u) * rho * G(i) * Hu - Cs_l * rho * G(i) * (- Hl) - (Csv_l - Tp * Gs) * (P_thorax(j) + dP_RA)
-                    Psv_l = P_thorax(j) + dP_RA + rho * G(i) * (- Hl)
-                    Psv_u = P_thorax(j) + dP_RA - rho * G(i) * Hu
-                    Psa_l = Psa_u_star + rho * G(i) * (Hu - Hl)
+                if P_thorax[j] >= rho * G[i] * Hu - dP_RA:
+                    Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs + Csa_l - Csv_u) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs) * (P_thorax[j] + dP_RA)
+                    Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
+                    Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
+                    Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
                     Qs_u = (Psa_u_star - Psv_u) / Rs_u
                     Qs_l = (Psa_l - Psv_l) / Rs_l
                     Q = Qs_u + Qs_l
                     F = Q / (C_RVD * (dP_RA))
-                    Ppv = P_thorax(j) + (C_LVD / C_RVD) * dP_RA
+                    Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
                     Ppa = Ppv + Q * Rp
         if Vd_total > 0:
             Vd_total_vec[i] = Vd_total
@@ -95,10 +99,10 @@ for j in np.arange(1,len(P_thorax)+1).reshape(-1):
             F_vec[i] = F
             Ppa_vec[i] = Ppa
         else:
-            Vd_total_vec[i] = NaN
-            Q_vec[i] = NaN
-            F_vec[i] = NaN
-            Ppa_vec[i] = NaN
+            Vd_total_vec[i] = np.nan
+            Q_vec[i] = np.nan
+            F_vec[i] = np.nan
+            Ppa_vec[i] = np.nan
     sol_Vd_Pthorax_G[j,:] = Vd_total_vec
     sol_Q_Pthorax_G[j,:] = Q_vec
     sol_F_Pthorax_G[j,:] = F_vec
@@ -131,11 +135,13 @@ beta = 1
 #family of plots for Reserve Volume vs. G for different Pthorax values:
 
 h = plt.figure(100)
-for i in np.arange(1,len(P_thorax)+1).reshape(-1):
-    myLineColor = myLineColorVec + alpha * (i - 1)
-    #myLineWidthPlot=myLineWidth+beta*(i-1); #set linewidth
-    myLineWidthPlot = myLineWidth
-    plt.plot(G,sol_Vd_Pthorax_G(i,:),myLineColorPref,'color',myLineColor,'LineWidth',myLineWidthPlot)
+plt.plot(G,sol_Vd_Pthorax_G[1,:])
+
+# for i in np.arange(1,len(P_thorax)+1).reshape(-1):
+#     myLineColor = myLineColorVec + alpha * (i - 1)
+#     #myLineWidthPlot=myLineWidth+beta*(i-1); #set linewidth
+#     myLineWidthPlot = myLineWidth
+#     plt.plot(G,sol_Vd_Pthorax_G[i,:])
 
 plt.xlabel('G')
 plt.ylabel('Reserve Volume (L)')
