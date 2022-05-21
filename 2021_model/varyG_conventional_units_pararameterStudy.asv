@@ -53,11 +53,10 @@ P_RA = P_thorax+dP_RA;
 figure(1)
 hold on
 for i=1:length(Hl)
-    G(:,i) = (Vtotal - Cp*(C_RVD/C_LVD)*(dP_RA) - (Tp*Gs+Csa)*Psa_u_star)/...
-            (Tp*Gs_l+Csa_l)*rho*Hu+ Cs_l*rho*(-Hl(i));
+    G(:,i) = (Vtotal - Cp*(C_RVD/C_LVD)*(dP_RA) - (Tp*Gs+Csa)*Psa_u_star)/(Tp*Gs_l+Csa_l)*rho*Hu+ Cs_l*rho*(-Hl(i));
     plot(Hu*2, G(:,i)/g_earth, 'k*-')
     title(num2str(-Hl(i)*2))
-end
+ end
 % xlabel('Upper Height (cm)_')
 % ylabel('Maximum G Tolerance')
 % hold off

@@ -6,8 +6,8 @@ Psa_u = Psa_u_star;
 dP_RA = 2*1333;
 
 height = 167.64; %cm
-Hu = 0.5*32%32;%cm %upper   32
-Hl = -(0.5*42);%cm %lower 42
+Hu = 0.5*32;%cm %upper  
+Hl = -(42/2);%cm %lower
 
 rho = 1; %g/cm^3
 g_earth = 980; %gravitational acceleration cm/s^2
@@ -33,7 +33,7 @@ Cs_l = Csa_l + Csv_l;
 Cpa = (0.00412/1333)*1000; 
 Cpv = (0.01/1333)*1000; 
 Cp = Cpa + Cpv;
-Vtotal = 3.7*1000; %3.7 cm^3
+Vtotal = 3.7*1000; %cm^3
 
 Csa = Csa_l+Csa_u;
 Gs = 1/Rs_u + 1/Rs_l; 
