@@ -7,8 +7,8 @@ Psa_u = Psa_u_star
 dP_RA = 2 * 1333
 height = 167.64
 
-Hu = 0.5 * 32
-Hl = - (42 / 2)
+Hu = 32
+Hl = - 42
 Hr = -Hu/Hl #height_ratio
 Hu_factor = 1-Hr
 Hl_factor = Hr
