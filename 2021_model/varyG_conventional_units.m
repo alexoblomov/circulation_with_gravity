@@ -42,8 +42,8 @@ Ts = Csa_u*Rs_u; %Csa_l*Rs_l
 Tp = Rp*Cpa;
 Csa = Csa_u+Csa_l;
 
-P_thorax = linspace(-4*1333,3*1333, 8); %mmHg * dynes/(mmHg*cm^2)
-%P_thorax = -4*1333;
+%P_thorax = linspace(-4*1333,3*1333, 8); %mmHg * dynes/(mmHg*cm^2)
+P_thorax = -4*1333;
 P_RA = P_thorax+dP_RA;
 
 Vd_total_vec = zeros(1,length(G)); 
@@ -185,10 +185,14 @@ hold on
     for i = 1:length(P_thorax)
         myLineColor=myLineColorVec+alpha*(i-1); %set grayscale
         plot(G,sol_F_Pthorax_G(i,:), myLineColorPref,'color', myLineColor,'LineWidth', myLineWidthPlot)
+        plot([1,2.2, 3.5],[73,77,100], "k*", 'MarkerSize', 14, 'LineWidth', myLineWidthPlot)
+        plot([3.5],[112], "r*", 'MarkerSize', 14, 'LineWidth', myLineWidthPlot)
+
     end
 hold off
 xlabel('G')
 ylabel('Heart Rate (per minute)')
+set(gca, 'FontSize', myLabelFontSize)
 hold on
 
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])

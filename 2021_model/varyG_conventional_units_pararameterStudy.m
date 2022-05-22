@@ -69,7 +69,6 @@ heatmap(G)
 h.XDisplayLabels = num2str((Hu*2)')
 h.YDisplayLabels = num2str((Hl*2)')
 
-heat
 heatmap(-Hl*2, Hu*2,G_new)
 Xlabel("Height Lower (cm)")
 Ylabel("Height Upper (cm)")

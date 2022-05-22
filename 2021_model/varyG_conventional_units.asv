@@ -6,8 +6,8 @@ Psa_u = Psa_u_star;
 dP_RA = 2*1333;
 
 height = 167.64; %cm
-Hu = 0.5*32;%cm %upper  
-Hl = -(42/2);%cm %lower
+Hu = 0.5*32%32;%cm %upper   32
+Hl = -(42);%cm %lower 42
 
 rho = 1; %g/cm^3
 g_earth = 980; %gravitational acceleration cm/s^2
@@ -15,8 +15,8 @@ G = linspace(980,980*10, 10000); %cm/s^2
 
 Rs = (16.49)*1333/(1000/60); %default 17.86, 16.49-20.02 (too high) systemic resistance (mmHg/(liters/s))
 Gs = 1/Rs;
-Gs_u = (1/3)*Gs;
-Gs_l = (2/3)*Gs; 
+Gs_u = (32/(32+42))*Gs;
+Gs_l = (42/(32+42))*Gs; 
 Rs_l = 1/Gs_l;
 Rs_u = 1/Gs_u; 
 Rp = (1.61*1333)/(1000/60); %pulmonic resistance (mmHg/(liters/s))
@@ -33,7 +33,7 @@ Cs_l = Csa_l + Csv_l;
 Cpa = (0.00412/1333)*1000; 
 Cpv = (0.01/1333)*1000; 
 Cp = Cpa + Cpv;
-Vtotal = 3.7*1000; %cm^3
+Vtotal = 3.7*1000; %3.7 cm^3
 
 Csa = Csa_l+Csa_u;
 Gs = 1/Rs_u + 1/Rs_l; 
@@ -185,10 +185,12 @@ hold on
     for i = 1:length(P_thorax)
         myLineColor=myLineColorVec+alpha*(i-1); %set grayscale
         plot(G,sol_F_Pthorax_G(i,:), myLineColorPref,'color', myLineColor,'LineWidth', myLineWidthPlot)
+        plot([1,2.2, 3.5],[73,77,100], "*")
     end
 hold off
 xlabel('G')
 ylabel('Heart Rate (per minute)')
+set(gca, 'FontSize', myLabelFontSize)
 hold on
 
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
