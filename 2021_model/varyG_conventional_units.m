@@ -24,8 +24,8 @@ Rp = (1.61*1333)/(1000/60); %pulmonic resistance (mmHg/(liters/s))
 C_RVD = (0.0350/1333)*1000; %right-ventricular diastolic compliance (liters/mmHg)
 C_LVD = (0.00583/1333)*1000; %left-ventricular diastolic compliance (liters/mmHg)
 
-Csa_l = [(2/3)*(0.0018/1333)*1000 (2/3)*(0.002/1333)*1000 (2/3)*(0.0012/1333)*1000];
-Csa_u = [(1/3)*(0.0018/1333)*1000 (1/3)*(0.002/1333)*1000 (1/3)*(0.0012/1333)*1000]; 
+Csa_l = [(2/3)*(0.0012/1333)*1000 (2/3)*(0.0018/1333)*1000 (2/3)*(0.002/1333)*1000];
+Csa_u = [(1/3)*(0.0012/1333)*1000 (1/3)*(0.0018/1333)*1000 (1/3)*(0.002/1333)*1000]; 
 Csv_l = (2/3)*(0.09/1333)*1000;
 Csv_u = (1/3)*(0.09/1333)*1000;
 Cs_l = Csa_l + Csv_l;
@@ -126,12 +126,12 @@ sol_Vd_Csa_G = sol_Vd_Csa_G/1000;
 %%% PLOT OPTIONS %%%
  
 %%plot(x, y,myLineColorPref,'color', myLineColorVec,'LineWidth', myLineWidth) %buffer times in black
-myLineColorPref="k-"; %black line
-myLineColorVec = [0,0,0]; %black -> shades of gray
-myLineWidth = 1;
-myLabelFontSize=18;
-alpha=0.1; %increment for gray
-beta=1;
+% myLineColorPref="k-"; %black line
+% myLineColorVec = [0,0,0]; %black -> shades of gray
+% myLineWidth = 1;
+% myLabelFontSize=18;
+% alpha=0.1; %increment for gray
+% beta=1;
 
 %label_P_thorax = num2str([-3:4]'); %in mm Hg, from -3 to 4
 
@@ -211,14 +211,23 @@ beta=1;
 % end
 % % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 % % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
+% figure(1)
+% for i = 1:length(Csa)
+%     plot(G, sol_F_Csa_G)
+%     xlabel('G')
+%     ylabel('Heart Rate (per minute)')
+%     hold on
+% end
+
+% xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
+% % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
+
 figure(1)
 for i = 1:length(Csa)
-    plot(G, sol_F_Csa_G)
-    hold on
-end
-figure(2)
-for i = 1:length(Csa)
     plot(G, sol_Vd_Csa_G)
+    xlabel('G')
+    ylabel('Reserve Volume (L)')
+    title('G tolerance varying arterial compliance')
     hold on
 end
-
+legend('Csa = 1.2 mL/mmHg','Csa = 1.8 mL/mmHg','Csa = 2.0 mL/mmHg')

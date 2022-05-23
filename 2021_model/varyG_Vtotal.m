@@ -33,7 +33,7 @@ Cs_l = Csa_l + Csv_l;
 Cpa = (0.00412/1333)*1000; 
 Cpv = (0.01/1333)*1000; 
 Cp = Cpa + Cpv;
-Vtotal = [3.7*1000 4*1000 4.3*1000 4.6*1000 4.9*1000 5.2*1000 5.5*1000 3.7*1000 5.8*1000]; % cm^3 * 1000
+Vtotal = [3.7*1000 4*1000 4.3*1000 4.6*1000 4.9*1000 5.2*1000 5.5*1000 5.8*1000 6.1*1000]; % cm^3 * 1000
 
 
 Gs = 1/Rs_u + 1/Rs_l; 
@@ -125,21 +125,27 @@ sol_Vd_Vtotal_G = sol_Vd_Vtotal_G/1000;
 %%% PLOT OPTIONS %%%
  
 %%plot(x, y,myLineColorPref,'color', myLineColorVec,'LineWidth', myLineWidth) %buffer times in black
-myLineColorPref="k-"; %black line
-myLineColorVec = [0,0,0]; %black -> shades of gray
-myLineWidth = 1;
-myLabelFontSize=18;
-alpha=0.1; %increment for gray
-beta=1;
+% myLineColorPref="k-"; %black line
+% myLineColorVec = [0,0,0]; %black -> shades of gray
+% myLineWidth = 1;
+% myLabelFontSize=18;
+% alpha=0.1; %increment for gray
+% beta=1;
 
+% figure(1)
+% for i = 1 : length(Vtotal)
+%     plot(G, sol_F_Vtotal_G)
+%     xlabel('G')
+%     ylabel('Heart Rate (per minute)')
+%     hold on
+% end
+   
 figure(1)
 for i = 1 : length(Vtotal)
-    plot(G, sol_F_Vtotal_G)
-    hold on
-end
-   
-figure(2)
-for i = 1 : length(Vtotal)
     plot(G, sol_Vd_Vtotal_G)
+    xlabel('G')
+    ylabel('Reserve Volume (L)')
+    title('G Tolerance varying total blood volume')
     hold on
 end
+legend('3.7 L', '4.0 L', '4.3 L', '4.6 L', '4.9 L', '5.2 L', '5.5 L', '5.8 L', '6.1 L')
