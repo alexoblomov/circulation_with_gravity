@@ -16,7 +16,7 @@ rho = 1
 
 g_earth = 980
 
-G = np.linspace(980,980 * 10,1000)
+G = np.linspace(1.5*980,1.7*980, 3)
 
 Rs = (16.49) * 1333 / (1000 / 60)
 
@@ -64,7 +64,10 @@ sol_Vd_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_Q_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_F_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_Ppa_Pthorax_G = np.zeros((len(P_thorax),len(G)))
+
+
 for j in range(len(P_thorax)):
+    # dP_RA = P_RA[j] - P_thorax[j]
     for i in range(len(G)):
         if P_thorax[j] <= - dP_RA:
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * (dP_RA) - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl)
@@ -114,6 +117,7 @@ for j in range(len(P_thorax)):
     sol_F_Pthorax_G[j,:] = F_vec
     sol_Ppa_Pthorax_G[j,:] = Ppa_vec
 
+breakpoint()
 #conversions:
 G = G / 100 / (g_earth / 100)
 sol_Q_Pthorax_G = sol_Q_Pthorax_G * 60 / 1000
@@ -162,7 +166,7 @@ for n, plt_title in enumerate(pthorax_titles):
     ax.set_xlabel("g multiple")
     ax.set_ylabel("VT0")
 # plt.show()
-plt.savefig("VT0_vs_g.png")
+plt.savefig("VT0_vs_g_V0.png")
 
 #################### code needs to be adapted from here on #####################
 # h1 = plt.figure(101)
