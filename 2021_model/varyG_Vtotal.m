@@ -33,7 +33,7 @@ Cs_l = Csa_l + Csv_l;
 Cpa = (0.00412/1333)*1000; 
 Cpv = (0.01/1333)*1000; 
 Cp = Cpa + Cpv;
-Vtotal = [3.7*1000 4*1000 4.3*1000 4.6*1000 4.9*1000 5.2*1000 5.5*1000 5.8*1000 6.1*1000]; % cm^3 * 1000
+Vtotal = [.9*3.7*1000 .95*3.7*1000 .98*3.7*1000 3.7*1000 1.02*3.7*1000 1.05*3.7*1000]; % cm^3 * 1000
 
 
 Gs = 1/Rs_u + 1/Rs_l; 
@@ -142,10 +142,11 @@ sol_Vd_Vtotal_G = sol_Vd_Vtotal_G/1000;
    
 figure(1)
 for i = 1 : length(Vtotal)
-    plot(G, sol_Vd_Vtotal_G)
+    plot(G, sol_Vd_Vtotal_G(i,:), 'linewidth', 2, 'Color', [0, 0, 0] + 0.15*i)
     xlabel('G')
     ylabel('Reserve Volume (L)')
     title('G Tolerance varying total blood volume')
     hold on
 end
-legend('3.7 L', '4.0 L', '4.3 L', '4.6 L', '4.9 L', '5.2 L', '5.5 L', '5.8 L', '6.1 L')
+legend("-10%", "-5%", "-2%", "3.7 L", "+2%", "+5%")
+set(gca, 'fontSize', 18)

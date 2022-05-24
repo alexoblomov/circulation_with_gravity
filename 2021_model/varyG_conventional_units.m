@@ -224,10 +224,11 @@ sol_Vd_Csa_G = sol_Vd_Csa_G/1000;
 
 figure(1)
 for i = 1:length(Csa)
-    plot(G, sol_Vd_Csa_G)
+    plot(G, sol_Vd_Csa_G(i,:), 'linewidth', 2, 'Color', [0, 0, 0] + 0.25*i)
     xlabel('G')
     ylabel('Reserve Volume (L)')
     title('G tolerance varying arterial compliance')
     hold on
 end
 legend('Csa = 1.2 mL/mmHg','Csa = 1.8 mL/mmHg','Csa = 2.0 mL/mmHg')
+set(gca, 'fontSize', 18)
