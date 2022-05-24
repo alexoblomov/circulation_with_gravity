@@ -7,11 +7,13 @@ Psa_u = Psa_u_star
 dP_RA = 2 * 1333
 height = 167.64
 
-Hu = 32
-Hl = - 42
-Hr = -Hu/Hl #height_ratio
-Hu_factor = 1-Hr
-Hl_factor = Hr
+Hu_karen = 32
+Hl_karen = -42
+lumped_height = Hu_karen + (-Hl_karen)
+
+Hu_factor = Hu_karen /lumped_height
+Hl_factor = - Hl_karen/lumped_height
+
 rho = 1
 
 g_earth = 980
@@ -21,8 +23,8 @@ G = np.linspace(1.5*980,1.7*980, 3)
 Rs = (16.49) * 1333 / (1000 / 60)
 
 Gs = 1 / Rs
-Gs_u = (1 / 3) * Gs
-Gs_l = (2 / 3) * Gs
+Gs_u = Hu_factor * Gs
+Gs_l = Hl_factor * Gs
 Rs_l = 1 / Gs_l
 Rs_u = 1 / Gs_u
 Rp = (1.61 * 1333) / (1000 / 60)
@@ -31,10 +33,10 @@ C_RVD = (0.035 / 1333) * 1000
 
 C_LVD = (0.00583 / 1333) * 1000
 
-Csa_l = (2 / 3) * (0.00175 / 1333) * 1000
-Csa_u = (1 / 3) * (0.00175 / 1333) * 1000
-Csv_l = (2 / 3) * (0.09 / 1333) * 1000
-Csv_u = (1 / 3) * (0.09 / 1333) * 1000
+Csa_l = Hl_factor * (0.00175 / 1333) * 1000
+Csa_u = Hu_factor * (0.00175 / 1333) * 1000
+Csv_l = Hl_factor * (0.09 / 1333) * 1000
+Csv_u = Hu_factor * (0.09 / 1333) * 1000
 Cs_l = Csa_l + Csv_l
 Cpa = (0.00412 / 1333) * 1000
 Cpv = (0.01 / 1333) * 1000
@@ -65,9 +67,11 @@ sol_Q_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_F_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 sol_Ppa_Pthorax_G = np.zeros((len(P_thorax),len(G)))
 
+Hu = Hu_karen
+Hl = Hl_karen
 
 for j in range(len(P_thorax)):
-    # dP_RA = P_RA[j] - P_thorax[j]
+    dP_RA = P_RA[j] - P_thorax[j]
     for i in range(len(G)):
         if P_thorax[j] <= - dP_RA:
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * (dP_RA) - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl)
@@ -76,32 +80,30 @@ for j in range(len(P_thorax)):
             Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
             Ppa = Ppv + Q * Rp
             cases[j, i] = 1
-        else:
-            if P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
-                Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
-                Psv_l = - rho * G[i] * Hl + P_thorax[j] + dP_RA
-                Psv_u = 0
-                Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
-                Qs_u = Psa_u_star / Rs_u
-                Qs_l = (Psa_l - Psv_l) / Rs_l
-                Q = Qs_u + Qs_l
-                F = Q / (C_RVD * (dP_RA))
-                Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
-                Ppa = Ppv + Q * Rp
-                cases[j, i] = 2
-            else:
-                if P_thorax[j] >= rho * G[i] * Hu - dP_RA:
-                    Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs + Csa_l - Csv_u) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs) * (P_thorax[j] + dP_RA)
-                    Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
-                    Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
-                    Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
-                    Qs_u = (Psa_u_star - Psv_u) / Rs_u
-                    Qs_l = (Psa_l - Psv_l) / Rs_l
-                    Q = Qs_u + Qs_l
-                    F = Q / (C_RVD * (dP_RA))
-                    Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
-                    Ppa = Ppv + Q * Rp
-                    cases[j, i] = 3
+        elif P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
+            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
+            Psv_l = - rho * G[i] * Hl + P_thorax[j] + dP_RA
+            Psv_u = 0
+            Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
+            Qs_u = Psa_u_star / Rs_u
+            Qs_l = (Psa_l - Psv_l) / Rs_l
+            Q = Qs_u + Qs_l
+            F = Q / (C_RVD * (dP_RA))
+            Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
+            Ppa = Ppv + Q * Rp
+            cases[j, i] = 2
+        elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
+            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs + Csa_l - Csv_u) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs) * (P_thorax[j] + dP_RA)
+            Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
+            Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
+            Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
+            Qs_u = (Psa_u_star - Psv_u) / Rs_u
+            Qs_l = (Psa_l - Psv_l) / Rs_l
+            Q = Qs_u + Qs_l
+            F = Q / (C_RVD * (dP_RA))
+            Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
+            Ppa = Ppv + Q * Rp
+            cases[j, i] = 3
         if Vd_total > 0:
             Vd_total_vec[i] = Vd_total
             Q_vec[i] = Q
@@ -117,7 +119,6 @@ for j in range(len(P_thorax)):
     sol_F_Pthorax_G[j,:] = F_vec
     sol_Ppa_Pthorax_G[j,:] = Ppa_vec
 
-breakpoint()
 #conversions:
 G = G / 100 / (g_earth / 100)
 sol_Q_Pthorax_G = sol_Q_Pthorax_G * 60 / 1000
@@ -166,7 +167,7 @@ for n, plt_title in enumerate(pthorax_titles):
     ax.set_xlabel("g multiple")
     ax.set_ylabel("VT0")
 # plt.show()
-plt.savefig("VT0_vs_g_V0.png")
+plt.savefig("VT0_vs_g_V0_w_height_factor.png")
 
 #################### code needs to be adapted from here on #####################
 # h1 = plt.figure(101)

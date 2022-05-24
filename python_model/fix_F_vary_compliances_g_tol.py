@@ -8,18 +8,18 @@ Psa_u_star = 100 * 1333
 Psa_u = Psa_u_star
 height = 167.64
 
-Hu_karen = 32
-Hl_karen = -42
+Hu_karen = 32 # cm
+Hl_karen = -42 #cm
 lumped_height = Hu_karen + (-Hl_karen)
-# Hr = -Hu/Hl #height_ratio
 Hu_factor = Hu_karen /lumped_height
 Hl_factor = - Hl_karen/lumped_height
 rho = 1
-g_earth = 980
+g_earth = 980 # cm / m^2
 
 # Resistance and compliance constants
 
-# systemic resistance (mmHg/(liters/s))
+
+# resistance originally: 17.86 mmhg/L/min
 Rs = (16.49) * 1333 / (1000 / 60)
 
 Gs = 1 / Rs
@@ -29,7 +29,6 @@ Rs_l = 1 / Gs_l
 Rs_u = 1 / Gs_u
 Rp = (1.61 * 1333) / (1000 / 60)
 
-# right-ventricular diastolic compliance (liters/mmHg)
 C_RVD = (0.035 / 1333) * 1000
 # left
 C_LVD = (0.00583 / 1333) * 1000
@@ -97,6 +96,8 @@ for i in range(dx):
 
 # conversions:
 gtol_vs_CsaU_vs_CsaL = gtol_vs_CsaU_vs_CsaL / 100 / (g_earth / 100)
+Csa_u_range = np.around(Csa_u_range, 6) # ml/mmHg
+Csa_l_range = np.around(Csa_l_range, 6) # ml/mmHg
 
 # heatmap plot
 
@@ -118,14 +119,14 @@ fig.colorbar(im, ax=ax)
 # Show all ticks and label them with the respective list entries
 ax.set_xticks(xticks_, labels=xticklabels_)
 ax.set_yticks(yticks_, labels=yticklabels_)
-ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+# ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+# ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 ax.grid(False)
 # Rotate the tick labels and set their alignment.
 plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
          rotation_mode="anchor")
-fig.tight_layout(pad=2)
+fig.tight_layout(pad=2  )
 
 plt.ylabel('upper compliance', fontsize = 12)
 plt.xlabel('lower compliance', fontsize = 12)
-plt.savefig('compliance_gtol.png')
+plt.savefig('compliance_gtol_height_factor.png')

@@ -8,9 +8,10 @@ height = 167.64
 
 Hu_karen = 32
 Hl_karen = -42
-# Hr = -Hu/Hl #height_ratio
-# Hu_factor = 1-Hr
-# Hl_factor = Hr
+lumped_height = Hu_karen + (-Hl_karen)
+
+Hu_factor = Hu_karen /lumped_height
+Hl_factor = - Hl_karen/lumped_height
 rho = 1
 g_earth = 980
 
@@ -20,8 +21,8 @@ g_earth = 980
 Rs = (16.49) * 1333 / (1000 / 60)
 
 Gs = 1 / Rs
-Gs_u = (1 / 3) * Gs
-Gs_l = (2 / 3) * Gs
+Gs_u = Hu_factor * Gs
+Gs_l = Hl_factor * Gs
 Rs_l = 1 / Gs_l
 Rs_u = 1 / Gs_u
 Rp = (1.61 * 1333) / (1000 / 60)
@@ -32,10 +33,10 @@ C_RVD = (0.035 / 1333) * 1000
 C_LVD = (0.00583 / 1333) * 1000
 
 # other compliances
-Csa_l = (2 / 3) * (0.00175 / 1333) * 1000
-Csa_u = (1 / 3) * (0.00175 / 1333) * 1000
-Csv_l = (2 / 3) * (0.09 / 1333) * 1000
-Csv_u = (1 / 3) * (0.09 / 1333) * 1000
+Csa_l = Hl_factor * (0.00175 / 1333) * 1000
+Csa_u = Hu_factor * (0.00175 / 1333) * 1000
+Csv_l = Hl_factor * (0.09 / 1333) * 1000
+Csv_u = Hu_factor * (0.09 / 1333) * 1000
 Cpa = (0.00412 / 1333) * 1000
 Cpv = (0.01 / 1333) * 1000
 Cp = Cpa + Cpv
@@ -65,7 +66,7 @@ max_F = 180 # maximum allowed heart rate
 
 # WE NEED TO SOLVE WHOLE SYSTEM THEN CALCULATE INTERCEPT. PLACEHOLDER CODE
 # for a given g
-dx = 10
+dx = 100
 Hu_range = np.linspace(0.5*Hu_karen, 1.8*Hu_karen, dx)
 Hl_range = np.linspace(0.5*Hl_karen, 1.5*Hl_karen, dx)
 
@@ -91,7 +92,8 @@ for i in range(dx):
 
 # conversions:
 gtol_vs_Hu_vs_Hl = gtol_vs_Hu_vs_Hl / 100 / (g_earth / 100)
-
+Hu_range = np.around(Hu_range, 2)
+Hl_range = np.around(Hu_range, 2)
 # heatmap plot
 
 num_ticks = 10
@@ -121,8 +123,6 @@ ax.set_yticks(yticks_, labels=yticklabels_)
 # plt.setp( ax.xaxis.get_majorticklabels(), rotation=45, ha="left", rotation_mode="anchor")
 # plt.setp( ax.xaxis.get_majorticklabels(), rotation=45, ha="right" )
 
-ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 ax.grid(False)
 # Rotate the tick labels and set their alignment.
 plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
@@ -131,4 +131,4 @@ fig.tight_layout(pad=3)
 
 plt.ylabel('heart to head height', fontsize = 12)
 plt.xlabel('heart to seat height', fontsize = 12)
-plt.savefig('heights_gtol.png')
+plt.savefig('heights_gtol_height_factor.png')
