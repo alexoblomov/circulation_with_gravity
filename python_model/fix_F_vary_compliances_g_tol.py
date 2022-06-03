@@ -14,12 +14,13 @@ lumped_height = Hu_karen + (-Hl_karen)
 Hu_factor = Hu_karen /lumped_height
 Hl_factor = - Hl_karen/lumped_height
 rho = 1
-g_earth = 980 # cm / m^2
+g_earth = 980 # cm / s^2
 
 # Resistance and compliance constants
 
 
 # resistance originally: 17.86 mmhg/L/min
+# -> now dynes/cm^2 / cm3 / s
 Rs = (16.49) * 1333 / (1000 / 60)
 
 Gs = 1 / Rs
@@ -35,6 +36,7 @@ C_LVD = (0.00583 / 1333) * 1000
 
 # other compliances
 # -> vary arterial compliances for hypertensive patients
+# was L/mmHg now ? in cm3 / (dynes/cm2)
 Csa_l = Hl_factor * (0.00175 / 1333) * 1000
 Csa_u = Hu_factor * (0.00175 / 1333) * 1000
 Csv_l = Hl_factor * (0.09 / 1333) * 1000
@@ -42,6 +44,8 @@ Csv_u = Hu_factor * (0.09 / 1333) * 1000
 Cpa = (0.00412 / 1333) * 1000
 Cpv = (0.01 / 1333) * 1000
 Cp = Cpa + Cpv
+
+# in cm3
 Vtotal = 3.7 * 1000
 
 # aggregate constants
