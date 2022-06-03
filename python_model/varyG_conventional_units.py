@@ -44,13 +44,12 @@ Cp = Cpa + Cpv
 Vtotal = 3.7 * 1000
 
 Csa = Csa_l + Csa_u
-Gs = 1 / Rs_u + 1 / Rs_l
-Gs_l = 1 / Rs_l
+# Gs = 1 / Rs_u + 1 / Rs_l
 Ts = Csa_u * Rs_u
 
 Tp = Rp * Cpa
 Csa = Csa_u + Csa_l
-P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
+P_thorax = np.linspace(- 4 * 1333,100 * 1333,8)
 
 #P_thorax = -4*1333;
 P_RA = P_thorax + dP_RA
@@ -74,34 +73,83 @@ for j in range(len(P_thorax)):
     dP_RA = P_RA[j] - P_thorax[j]
     for i in range(len(G)):
         if P_thorax[j] <= - dP_RA:
-            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * (dP_RA) - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl)
-            Q = ((1 / Rs_u) + (1 / Rs_l)) * Psa_u_star + rho * G[i] * Hu / Rs_l
+            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * (dP_RA) \
+                       - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) \
+                       * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl)
+            Q = Gs * Psa_u_star + rho * G[i] * Hu / Rs_l
             F = Q / (C_RVD * (P_RA[j] - P_thorax[j]))
-            Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
+            Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 44
             Ppa = Ppv + Q * Rp
+            Ppa_also = P_thorax[i] + (C_RVD / C_LVD) * dP_RA + Q*Rp
+            # assert (np.abs(Ppa - Ppa_also) < 0.01)
             cases[j, i] = 1
         elif P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
-            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs_l + Csa_l) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
+            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
+                      - (Tp * Gs + Csa)* Psa_u_star \
+                      - (Tp * Gs_l + Csa_l) * (rho * G[i] * Hu - Cs_l *
+                                               rho * G[i] * (- Hl)) \
+                      - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
             Psv_l = - rho * G[i] * Hl + P_thorax[j] + dP_RA
             Psv_u = 0
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
-            Qs_u = Psa_u_star / Rs_u
-            Qs_l = (Psa_l - Psv_l) / Rs_l
+            # Qs_u = Psa_u_star / Rs_u
+            # Qs_l = (Psa_l - Psv_l) / Rs_l
+            Qs_u = Psa_u_star * 1 / Rs_u # eq 61
+            #eq 62
+            Qs_l = (Psa_u_star + rho * G[i] * Hu - P_thorax[j]-dP_RA) * 1/Rs_l
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
-            Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
+            F_also = (Gs * Psa_u_star +
+                      (1/Rs_l)* (rho*G[i]*Hu-P_thorax[i] - dP_RA)) / (
+                      C_RVD*dP_RA)
+            # breakpoint()
+            # assert F == F_also, "F, equation 64 inconsistent"
+            # (Pdb) F
+            # 1.7248725549967021
+            # (Pdb) F_also
+            # 1.7494574795209836
+
+            Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 66
             Ppa = Ppv + Q * Rp
+            Ppa_also = (C_RVD / C_LVD) * dP_RA + Rp*(Gs*Psa_u_star + 1/Rs_l *
+                        (rho * G[i] *Hu - P_thorax[i] - dP_RA))
+            # (Pdb) Ppa
+            # 30219.708890709935
+            # (Pdb) Ppa_also
+            # 29308.135553880078
+            # assert Ppa == Ppa_also, "Ppa eq 67 inconsistent"
             cases[j, i] = 2
         elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
-            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - (Tp * Gs + Csa) * Psa_u_star - (Tp * Gs + Csa_l - Csv_u) * rho * G[i] * Hu - Cs_l * rho * G[i] * (- Hl) - (Csv_l - Tp * Gs) * (P_thorax[j] + dP_RA)
+            print("entered case III")
+            Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - \
+                    (Tp*Gs + Csa_l+Csa_u)*Psa_u_star \
+                    +(Tp*Gs + Csa_u - Csv_l) * rho * G[i] * Hu \
+                    + (Csa_l+Csv_l) * rho * G[i] * (-Hl) \
+                    + (Csv_l+Csv_u - Tp*Gs)* (P_thorax[j] - dP_RA)
+
             Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
             Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
             Qs_u = (Psa_u_star - Psv_u) / Rs_u
+            Qs_u_also = (Psa_u_star + rho*G[i]*Hu - P_thorax[j] - dP_RA)/Rs_u
+            # assert  Qs_u == Qs_u_also, "QsU eq 81 inconsistent"
+            # (Pdb) Qs_u
+            # 40.523557770364924
+            # (Pdb) Qs_u_also
+            # 40.523557770364924
+
+            # breakpoint()
             Qs_l = (Psa_l - Psv_l) / Rs_l
+            Qs_l_also = (Psa_u_star + rho*G[i]*Hu - P_thorax[j] - dP_RA)/Rs_l
+            # Qs_l == Qs_l_also, "QsL eq 82 inconsistent"
+            # (Pdb) Qs_l
+            # 53.18716957360396
+            # (Pdb) Qs_l_also
+            # 53.18716957360396
+
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
-            Ppv = P_thorax[j] + (C_LVD / C_RVD) * dP_RA
+            Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA
             Ppa = Ppv + Q * Rp
             cases[j, i] = 3
         if Vd_total > 0:
@@ -167,7 +215,7 @@ for n, plt_title in enumerate(pthorax_titles):
     ax.set_xlabel("g multiple")
     ax.set_ylabel("VT0")
 # plt.show()
-plt.savefig("VT0_vs_g_V0_w_height_factor.png")
+plt.savefig("fixed_VT0_vs_g_V0_w_height_factor.png")
 
 #################### code needs to be adapted from here on #####################
 # h1 = plt.figure(101)
