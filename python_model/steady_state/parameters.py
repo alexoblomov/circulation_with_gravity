@@ -2,12 +2,14 @@
 Karen's parameters for the model
 
 pressures originally in mmHg, converted to dynes/cm2
+1 dyne = 1 g⋅cm/s2
 heights in cm
 volumes originally in L, converted to cm^3
-g in m/s2
+g in cm/s2
 compliances originally in L/mmHg and converted to cm^3/dynes/cm2
-resistances in (dynes/cm2)/(cm^3/s)
+resistances in (dynes/cm2)/(cm^3/s) - force/area / flow (vol/time)
 Ts, the time constant is in seconds
+density is in g/cm3
 """
 Psa_u_star = 100 * 1333
 
@@ -54,4 +56,3 @@ Csa = Csa_l + Csa_u
 Ts = Csa_u * Rs_u
 
 Tp = Rp * Cpa
-Csa = Csa_u + Csa_l
