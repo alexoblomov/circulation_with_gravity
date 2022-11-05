@@ -1,0 +1,6 @@
+*.pdf
+*.png
+*.jpg
+*.eps
+*.pyc
+/python_model/steady_state/.directory
