@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
 
-G = np.linspace(1.5*980,1.7*980, 3)
+# G = np.linspace(g_earth, 1.7*980, 3)
+G = np.linspace(g_earth, g_earth, 1)
 
 P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
 
@@ -40,7 +41,10 @@ for j in range(len(P_thorax)):
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 44
             Ppa = Ppv + Q * Rp
             Ppa_also = P_thorax[i] + (C_RVD / C_LVD) * dP_RA + Q*Rp
-            # assert (np.abs(Ppa - Ppa_also) < 0.01)
+            try:
+                assert (np.abs(Ppa - Ppa_also) < 0.01), "Ppa eq inconsistent"
+            except AssertionError as e:
+                print("Case 1: Ppa ", Ppa, " Ppa_also ", Ppa_also)
             cases[j, i] = 1
         elif P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
@@ -61,14 +65,20 @@ for j in range(len(P_thorax)):
             F_also = (Gs * Psa_u_star +
                       (1/Rs_l)* (rho*G[i]*Hu-P_thorax[i] - dP_RA)) / (
                       C_RVD*dP_RA)
-            breakpoint()
-            # assert F == F_also, "F, equation 64 inconsistent"
+            try:
+                assert (np.abs(F - F_also) < 0.01), "F eq 64 inconsistent"
+            except AssertionError as e:
+                print("Case 2:, F ", F, " F_also ", F_also)
 
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 66
             Ppa = Ppv + Q * Rp
             Ppa_also = (C_RVD / C_LVD) * dP_RA + Rp*(Gs*Psa_u_star + 1/Rs_l *
                         (rho * G[i] *Hu - P_thorax[i] - dP_RA))
-            assert Ppa == Ppa_also, "Ppa eq 67 inconsistent"
+            try:
+                assert (np.abs(Ppa - Ppa_also) < 0.01), "Ppa eq 67 inconsistent"
+            except AssertionError as e:
+                print("Case 2: Ppa ", Ppa, " Ppa_also ", Ppa_also)
+
             cases[j, i] = 2
         elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - \
@@ -80,12 +90,23 @@ for j in range(len(P_thorax)):
             Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
             Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
+
             Qs_u = (Psa_u_star - Psv_u) / Rs_u
             Qs_u_also = (Psa_u_star + rho*G[i]*Hu - P_thorax[j] - dP_RA)/Rs_u
-            assert  Qs_u == Qs_u_also, "QsU eq 81 inconsistent"
+
+            try:
+                assert (np.abs(Qs_u - Qs_u_also) < 0.01), "Qs_u eq 81 inconsistent"
+            except AssertionError as e:
+                print("Case 3: Qs_u ", Qs_u, " Qs_u_also ", Qs_u_also)
+
             Qs_l = (Psa_l - Psv_l) / Rs_l
             Qs_l_also = (Psa_u_star + rho*G[i]*Hu - P_thorax[j] - dP_RA)/Rs_l
-            Qs_l == Qs_l_also, "QsL eq 82 inconsistent"
+
+            try:
+                assert (np.abs(Qs_l - Qs_l_also) < 0.01), "Qs_l eq 82 inconsistent"
+            except AssertionError as e:
+                print("Case 3: Qs_l ", Qs_l, " Qs_l_also ", Qs_l_also)
+
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA
@@ -112,83 +133,3 @@ sol_Q_Pthorax_G = sol_Q_Pthorax_G * 60 / 1000
 sol_F_Pthorax_G = sol_F_Pthorax_G * 60
 sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G / 1333
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
-### PLOT OPTIONS ###
-
-##plot(x, y,myLineColorPref,'color', myLineColorVec,'LineWidth', myLineWidth) #buffer times in black
-# myLineColorPref = 'k-'
-#
-# myLineColorVec = np.array([0,0,0])
-#
-# myLineWidth = 1
-# myLabelFontSize = 18
-# alpha = 0.1
-#
-# beta = 1
-
-#family of plots for Reserve Volume vs. G for different Pthorax values:
-
-# plt.show()
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-
-
-plt.figure(figsize=(15, 12))
-plt.subplots_adjust(hspace=0.5)
-plt.suptitle("Reserve volume vs g", fontsize=18, y=0.95)
-pthorax_titles = ["P thorax " + str(pth / 1333) + " mmHg" for pth in P_thorax]
-# loop through the length of tickers and keep track of index
-for n, plt_title in enumerate(pthorax_titles):
-    # add a new subplot iteratively
-    ax = plt.subplot(4, 2, n + 1)
-
-    # filter df and plot ticker on the new subplot axis
-    idx_case_1 = cases == 1
-    idx_case_2 = cases == 2
-    idx_case_3 = cases == 3
-    ax.plot(G,sol_Vd_Pthorax_G[n,:])
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_2],'g')
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_3],'b')
-    # chart formatting
-    ax.set_title(plt_title)
-    # ax.get_legend().remove()
-    ax.set_xlabel("g multiple")
-    ax.set_ylabel("VT0")
-# plt.show()
-plt.savefig("fixed_VT0_vs_g_V0_w_height_factor.png")
-
-#################### code needs to be adapted from here on #####################
-# h1 = plt.figure(101)
-# clf(101)
-# for i in np.arange(1,len(P_thorax)+1).reshape(-1):
-#     plt.plot(G,sol_Q_Pthorax_G(i,:))
-#     plt.xlabel('G','interpreter','latex')
-#     plt.ylabel('Cardiac Output (L/min)','interpreter','latex')
-#     hold('on')
-
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-
-# h2 = plt.figure(102)
-# clf(102)
-# hold('on')
-# for i in np.arange(1,len(P_thorax)+1).reshape(-1):
-#     myLineColor = myLineColorVec + alpha * (i - 1)
-#     plt.plot(G,sol_F_Pthorax_G(i,:),myLineColorPref,'color',myLineColor,'LineWidth',myLineWidthPlot)
-#
-# hold('off')
-# plt.xlabel('G')
-# plt.ylabel('Heart Rate (per minute)')
-# hold('on')
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-#
-# h3 = plt.figure(103)
-# clf(103)
-# for i in np.arange(1,len(P_thorax)+1).reshape(-1):
-#     plt.plot(G,sol_Ppa_Pthorax_G(i,:))
-#     plt.xlabel('G','interpreter','latex')
-#     plt.ylabel('Pulmonary Arterial Pressure (mmHg)','interpreter','latex')
-#     hold('on')
-
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
