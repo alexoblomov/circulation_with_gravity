@@ -47,6 +47,8 @@ Cs_l = Csa_l + Csv_l
 Cpa = (0.00412 / 1333) * 1000
 Cpv = (0.01 / 1333) * 1000
 Cp = Cpa + Cpv
+#  RANDOM GUESS. # TODO: change to real value
+Cra = (0.01 / 1333) * 1000
 Vtotal = 3.7 * 1000
 
 Csa = Csa_l + Csa_u
