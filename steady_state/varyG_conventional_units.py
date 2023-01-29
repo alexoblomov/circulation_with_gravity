@@ -181,6 +181,22 @@ for n, plt_title in enumerate(pthorax_titles):
 # plt.show()
 plt.savefig("fixed_VT0_vs_g_V0_w_height_factor.png")
 
+plt.figure()
+for n, plt_title in enumerate(pthorax_titles):
+    # add a new subplot iteratively
+    # filter df and plot ticker on the new subplot axis
+    idx_case_1 = cases == 1
+    idx_case_2 = cases == 2
+    idx_case_3 = cases == 3
+    plt.plot(G, sol_Vd_Pthorax_G[n, :])
+    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_2],'g')
+    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_3],'b')
+    # chart formatting
+    plt.title(plt_title)
+    # ax.get_legend().remove()
+    plt.xlabel("g multiple")
+    plt.ylabel("VT0")
+plt.savefig("onegraph_VT0_vs_g_V0_w_height_factor.png")
 #################### code needs to be adapted from here on #####################
 # h1 = plt.figure(101)
 # clf(101)
