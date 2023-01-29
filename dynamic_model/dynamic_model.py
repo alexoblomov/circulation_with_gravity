@@ -24,6 +24,8 @@ F = np.zeros(T)
 P_ra = np.zeros(T)
 Psv_u = np.zeros(T)
 Psv_l = np.zeros(T)
+Psa_u = np.zeros(T)
+Psa_l = np.zeros(T)
 Pext_l = np.zeros(T)
 
 # TODO consider moving to parameters.py
@@ -53,30 +55,55 @@ Vsv0 = np.zeros(T)
 
 for t in T:
     # Case I:
-    dP_RA = P_ra[t] - P_thorax[t]:
+    dP_RA = P_ra[t] - P_thorax[t]
     if P_thorax[j] <= - dP_RA:
         # eq 20 => six cases for Pra:
-        if Pext_l[t] < rho* g[t] * Hl:
+        # eq 20 gives Pra
+        if Pext_l[t] < rho* g[t] * Hu:
             # /!\circular logic.
-            if P_ra[t] < Pext_l[t]:
+            if P_ra[t] <= Pext_l[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] -
-                          Csv_l*(rho*g[t]*Hl - Pext_l[t]) +
-                          Csv_u[t]*rho*g[t]*Hu + Cra * P_thorax[t]
-                          Csv_l*Pext_l[t] - Csv_u*rho*g[t] * Hu) / Cra
+                            Csv_l*(rho*g[t]*Hl) +
+                            Cra * P_thorax[t]) / Cra
+            elif P_ra[t] >= Pext_l[t]:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * 
+                            (rho * g[t] * Hl - Pext_l[t]) + Cra * P_thorax[t]
+                            ) / (Cra + Csv_l)
+            elif rho * g[t] * Hu <= P_ra:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l  * (rho * g * Hl 
+                            - Pext_l[t]) + Csv_u * rho * g *Hu + Cra * 
+                            P_thorax(t)) / (Cra + Csv_u + Csv_l)
+        else:
+            if P_ra[t] <= rho * g[t] * Hu:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g[t] * Hl 
+                            - Pext_l[t]) + Cra * P_thorax[t] 
+                            - Csv_l*Pext_l[t]) / Cra
+            elif P_ra[t] >= rho * g[t] * Hu:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g[t] * Hl + 
+                           Csv_u * rho * g[t] * Hu + Cra * P_thorax[t]
+                          ) / (Cra + Csv_u)
+            elif Pext_l[t] <= P_ra[t]:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g[t] * Hl -
+                           Pext_l[t]) + Csv_u * rho * g[t] * Hu + Cra * P_thorax
+                          ) / (Cra + Csv_u + Csv_l)
+    
+ 
+                
 
-        Psv_u[t] = max(0, P_ra[t] - rho * g[t] * Hu)
-        Psv_l[t] = max(0, P_ra[t], Pext_l[t]) + rho*g[t] * Hl
+        Psv_u[t] = max(0, P_ra[t] - rho * g[t] * Hu) # eq 15
+        Psv_l[t] = max(P_ra,Pext_l) +rho*g[t]*Hl # eq 18
 
         Psa_u[t] = (Vsa[t] - Vsa0[0] + Csa_l*Pext_l[t] - Csa_l* rho * g[t]*H)/(
-                    Csa)
+                    Csa) # eq 12
         Psa_l[t] = (Vsa[t] - Vsa0[0] + Csa_l*Pext_l[t] - Csa_u* rho * g[t]*H)/(
-                    Csa)
+                    Csa) # eq 13
 
     # Case II
-elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:
+    elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:
+
         continue
     # Case III
-elif P_thorax[t] >= rho * g[t] * Hu - dP_RA:
+    elif P_thorax[t] >= rho * g[t] * Hu - dP_RA:
         continue
 
 
