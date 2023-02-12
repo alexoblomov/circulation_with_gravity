@@ -1,10 +1,17 @@
+"""
+Purpose: simulate model with varying values of G and plot output variables
+of interest
+Nb case III is only actualized when P_thorax is roughly 70x its nominal value
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
 
-G = np.linspace(1.5*980,1.7*980, 3)
+G = np.linspace(g_earth,1.7*980, 3)
 
-P_thorax = np.linspace(- 4 * 1333,100 * 1333,8)
+P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
 
 #P_thorax = -4*1333;
 P_RA = P_thorax + dP_RA
@@ -77,7 +84,7 @@ for j in range(len(P_thorax)):
             # assert Ppa == Ppa_also, "Ppa eq 67 inconsistent"
             cases[j, i] = 2
         elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
-            print("entered case III")
+            # print("entered case III")
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - \
                     (Tp*Gs + Csa_l+Csa_u)*Psa_u_star \
                     +(Tp*Gs + Csa_u - Csv_l) * rho * G[i] * Hu \
