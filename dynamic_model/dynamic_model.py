@@ -7,6 +7,14 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from parameters import *
 
+def solve_Vsa(Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_l, rho,
+              g, H, Q):
+    dydt = Q - Vsa/Csa*Rs_u - Vsa/Csa*Rs_l - (((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa
+                                ) - Psv_u) / Rs_u  - ( 
+                                ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
+                                ) - Psv_l) / Rs_l
+    
+
 
 T = np.linspace(0,100,1)
 n_t = len(T)
@@ -60,7 +68,6 @@ for t in T:
         # eq 20 => six cases for Pra:
         # eq 20 gives Pra
         if Pext_l[t] < rho* g[t] * Hu:
-            # /!\circular logic.
             if P_ra[t] <= Pext_l[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] -
                             Csv_l*(rho*g[t]*Hl) +
@@ -88,8 +95,6 @@ for t in T:
                           ) / (Cra + Csv_u + Csv_l)
     
  
-                
-
         Psv_u[t] = max(0, P_ra[t] - rho * g[t] * Hu) # eq 15
         Psv_l[t] = max(P_ra,Pext_l) +rho*g[t]*Hl # eq 18
 
