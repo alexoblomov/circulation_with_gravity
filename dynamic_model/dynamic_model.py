@@ -8,7 +8,7 @@ from scipy.integrate import odeint
 from parameters import *
 
 
-def solve_Vsa(Vsa0, Vsa, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
+def solve_Vsa(Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
               Psv_l, rho, g, H, Q):
 
     dydt = Q - Vsa/Csa*(1/Rs_u + 1/Rs_l) - (
@@ -18,9 +18,32 @@ def solve_Vsa(Vsa0, Vsa, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u,
     
     return dydt
 
-def solve_Vsv(Vsa0, Vsa, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
+def solve_Vsv(Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
               Psv_l, rho, g, H, Q):
+    """_summary_
+
+    Args:
+        Vsa (_type_): systemic arterial volume
+        Vsa0 (_type_): reserve arterial volume
+        Csa (_type_): systemic arterial compliance
+        Csa_l (_type_): systemic upper arterial compliance
+        Rs_u (_type_): systemic upper venous resistance
+        Rs_l (_type_): systemic lower venous resistance
+        Csa_u (_type_): systemic upper arterial compliance
+        Pext_l (_type_): lower pressure external to vascular system
+        Psa_u (_type_): pressure in upper systemic arteries
+        Psv_u (_type_): pressure in upper systemic veins
+        Psv_l (_type_): _description_
+        rho (_type_): _description_
+        g (_type_): _description_
+        H (_type_): total height
+        Q (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # dVsv/dt = -dVsa/dt
+    # breakpoint()
     dydt = Q - Vsa/Csa*(1/Rs_u + 1/Rs_l) - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
@@ -74,9 +97,15 @@ Vsa[0] = init_Vsa
 Vsv = np.zeros(n_timesteps+1)
 Vsv[0] = init_Vsv
 
+Vsa_s = np.zeros(n_timesteps+1)
+Vsv_s = np.zeros(n_timesteps+1)
+
 # reseve volumes
 Vsa0 = np.zeros(n_timesteps)
 Vsv0 = np.zeros(n_timesteps)
+
+# for solving for vsa/vsv with odeint
+t_interval = np.linspace(0, h, num=1)
 
 for t in range(n_timesteps):
     # Case I:
@@ -94,14 +123,14 @@ for t in range(n_timesteps):
                            (rho * g[t] * Hl - Pext_l[t]) + Cra * P_thorax[t]
                            ) / (Cra + Csv_l)
             elif rho * g[t] * Hu <= P_ra:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
-                                                       - Pext_l[t]) + Csv_u * rho * g * Hu + Cra *
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
+                           + Csv_u * rho * g * Hu + Cra *
                            P_thorax(t)) / (Cra + Csv_u + Csv_l)
         else:
             if P_ra[t] <= rho * g[t] * Hu:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g[t] * Hl
-                                                       - Pext_l[t]) + Cra * P_thorax[t]
-                           - Csv_l*Pext_l[t]) / Cra
+                                                       - Pext_l[t])
+                           + Cra * P_thorax[t] - Csv_l*Pext_l[t]) / Cra
             elif P_ra[t] >= rho * g[t] * Hu:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g[t] * Hl +
                            Csv_u * rho * g[t] * Hu + Cra * P_thorax[t]
@@ -115,9 +144,9 @@ for t in range(n_timesteps):
         Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g[t]*Hl  # eq 18
 
         Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g[t]*H)/(
-            Csa)  # eq 12
+                    Csa)  # eq 12
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g[t]*H)/(
-            Csa)  # eq 13
+                    Csa)  # eq 13
 
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u,
@@ -130,8 +159,11 @@ for t in range(n_timesteps):
                                           Psv_u[t], Psv_l[t], rho, g[t], H,
                                           Q[t])
 
+        print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
+    
+
     # # Case II
-    # elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:
+    # elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:z
 
     #     continue
     # # Case III
@@ -139,45 +171,3 @@ for t in range(n_timesteps):
     #     continue
 
 
-# def volume_odes(x,t):
-#     Qrv = x[0]
-#     Qlv = x[1]
-#     Qsa_l = x[2]
-#     Qsa_    u = x[3]
-#     Qsv_l = x[4]
-#     Qsv_u = x[5]
-#
-#     dVstroke_dt = Qrv - Qlv
-#     dVsa_udt = Qlv - Qsa_l
-#     dVsa_ldt = Qsa_u - Qsv_l
-#     dVsv_ldt = Qsa_l - Qsv_u
-#     dVsv_udt = Qsv_l -Qrv
-#
-#     return [dVstroke_dt, dVsa_udt, dVsa_ldt, dVsv_ldt, dVsv_udt]
-
-# initial conditions - wrong need flows not volume ??
-# oVstroke = 70 #ml
-# artery_vein_split = 0.5
-# oVsa_u = artery_vein_split * Hu_factor * Vtotal
-# oVsv_u = artery_vein_split * Hu_factor * Vtotal
-# oVsa_l = artery_vein_split * Hl_factor * Vtotal
-# oVsv_l = artery_vein_split * Hl_factor * Vtotal
-
-# x0 = [oVstroke, oVsa_u, oVsa_l, oVsv_l, oVsv_u]
-
-# Qrv = 500
-# Qlv = 500
-# Qsa_l = 500
-# Qsa_u = 500
-# Qsv_l = 500
-# Qsv_u = 500
-# x0 = 6*[Qrv]
-# test = volume_odes(x0, 0)
-
-# # timestep
-# t = np.linspace(0, 3*60)
-
-# # SOLVE
-# x = odeint(volume_odes, x0, t)
-# breakpoint()
-# # plot
