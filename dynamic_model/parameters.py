@@ -16,11 +16,11 @@ dP_RA = 2 * 1333
 height = 167.64
 
 Hu_patient = 32
-Hl_patient = -42
-lumped_height = Hu_patient + (-Hl_patient)
+Hl_patient = 42
+lumped_height = Hu_patient + Hl_patient
 
 Hu_factor = Hu_patient /lumped_height
-Hl_factor = - Hl_patient/lumped_height
+Hl_factor = Hl_patient/lumped_height
 
 rho = 1
 
@@ -47,6 +47,8 @@ Cs_l = Csa_l + Csv_l
 Cpa = (0.00412 / 1333) * 1000
 Cpv = (0.01 / 1333) * 1000
 Cp = Cpa + Cpv
+#  RANDOM GUESS. # TODO: change to real value
+Cra = (0.01 / 1333) * 1000
 Vtotal = 3.7 * 1000
 
 Csa = Csa_l + Csa_u
