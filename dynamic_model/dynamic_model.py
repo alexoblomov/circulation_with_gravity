@@ -11,39 +11,49 @@ from parameters import *
 def solve_Vsa(Vsa0, Vsa, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
               Psv_l, rho, g, H, Q):
 
-    dydt = Q - Vsa/Csa(1/Rs_u + 1/Rs_l) - (
+    dydt = Q - Vsa/Csa*(1/Rs_u + 1/Rs_l) - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
             ) - Psv_l) / Rs_l # dVsa/dt
     
     return dydt
 
+def solve_Vsv(Vsa0, Vsa, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
+              Psv_l, rho, g, H, Q):
+    # dVsv/dt = -dVsa/dt
+    dydt = Q - Vsa/Csa*(1/Rs_u + 1/Rs_l) - (
+            ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
+            ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
+            ) - Psv_l) / Rs_l # dVsv/dt
+    return dydt
 
 # time steps
 # forward euler time step
 h = 0.001
-T = np.linspace(0, 100, 1)
-n_t = len(T)
+n_timesteps = 100
+num_seconds = 60
+T = np.linspace(0, num_seconds, num=n_timesteps)
+# n_t = len(T)
 
 # TODO : change to vary gravity as fn of time
-g = g_earth*np.ones(T)
+# breakpoint()
+g = g_earth*np.ones(n_timesteps)
 
 # may want to make 2D in the future as we
 # vary gravity and/or other parameters
 
-Q = np.zeros(T)
+Q = np.zeros(n_timesteps)
 
-# does F need to be a fn of time?
-F = np.zeros(T)
-P_ra = np.zeros(T)
-Psv_u = np.zeros(T)
-Psv_l = np.zeros(T)
-Psa_u = np.zeros(T)
-Psa_l = np.zeros(T)
-Pext_l = np.zeros(T)
+F = np.zeros(n_timesteps)
+P_ra = np.zeros(n_timesteps)
+Psv_u = np.zeros(n_timesteps)
+Psv_l = np.zeros(n_timesteps)
+Psa_u = np.zeros(n_timesteps)
+Psa_l = np.zeros(n_timesteps)
+Pext_l = np.zeros(n_timesteps)
 
 # TODO consider moving to parameters.py
-P_thorax = (- 4 * 1333) * np.ones(T)
+P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
 
 # TODO vary normally around the nominal values of the relative heights
 Hu = Hu_patient
@@ -59,19 +69,19 @@ pct_venous = 0.7
 pct_arterial = 1 - pct_venous
 init_Vsa = Vtotal * pct_arterial
 init_Vsv = Vtotal * pct_venous
-Vsa = np.zeros(T)
+Vsa = np.zeros(n_timesteps+1)
 Vsa[0] = init_Vsa
-Vsv = np.zeros(T)
+Vsv = np.zeros(n_timesteps+1)
 Vsv[0] = init_Vsv
 
 # reseve volumes
-Vsa0 = np.zeros(T)
-Vsv0 = np.zeros(T)
+Vsa0 = np.zeros(n_timesteps)
+Vsv0 = np.zeros(n_timesteps)
 
-for t in T:
+for t in range(n_timesteps):
     # Case I:
     dP_RA = P_ra[t] - P_thorax[t]
-    if P_thorax[j] <= - dP_RA:
+    if P_thorax[t] <= - dP_RA:
         # eq 20 => six cases for Pra:
         # eq 20 gives Pra
         if Pext_l[t] < rho * g[t] * Hu:
@@ -102,16 +112,23 @@ for t in T:
                            ) / (Cra + Csv_u + Csv_l)
 
         Psv_u[t] = max(0, P_ra[t] - rho * g[t] * Hu)  # eq 15
-        Psv_l[t] = max(P_ra, Pext_l) + rho*g[t]*Hl  # eq 18
+        Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g[t]*Hl  # eq 18
 
         Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g[t]*H)/(
             Csa)  # eq 12
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g[t]*H)/(
             Csa)  # eq 13
 
-        Vsa[t+1] = Vsa[t] + h* solve_Vsa(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u, Rs_l,
-                                         Csa_u, Pext_l[t], Psa_u[t], Psv_u[t],
-                                         Psv_l[t], rho, g[t], H, Q[t])
+        # h is euler iteration timestep
+        Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u,
+                                          Rs_l, Csa_u, Pext_l[t], Psa_u[t],
+                                          Psv_u[t], Psv_l[t], rho, g[t], H,
+                                          Q[t])
+
+        Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u,
+                                          Rs_l, Csa_u, Pext_l[t], Psa_u[t],
+                                          Psv_u[t], Psv_l[t], rho, g[t], H,
+                                          Q[t])
 
     # # Case II
     # elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:
@@ -148,19 +165,19 @@ for t in T:
 
 # x0 = [oVstroke, oVsa_u, oVsa_l, oVsv_l, oVsv_u]
 
-Qrv = 500
-Qlv = 500
-Qsa_l = 500
-Qsa_u = 500
-Qsv_l = 500
-Qsv_u = 500
-x0 = 6*[Qrv]
-test = volume_odes(x0, 0)
+# Qrv = 500
+# Qlv = 500
+# Qsa_l = 500
+# Qsa_u = 500
+# Qsv_l = 500
+# Qsv_u = 500
+# x0 = 6*[Qrv]
+# test = volume_odes(x0, 0)
 
-# timestep
-t = np.linspace(0, 3*60)
+# # timestep
+# t = np.linspace(0, 3*60)
 
-# SOLVE
-x = odeint(volume_odes, x0, t)
-breakpoint()
-# plot
+# # SOLVE
+# x = odeint(volume_odes, x0, t)
+# breakpoint()
+# # plot
