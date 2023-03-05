@@ -8,16 +8,20 @@ from scipy.integrate import odeint
 from parameters import *
 
 
-def solve_Vsa(Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_l, rho,
-              g, H, Q):
+def solve_Vsa(Vsa0, Vsa, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
+              Psv_l, rho, g, H, Q):
 
     dydt = Q - Vsa/Csa(1/Rs_u + 1/Rs_l) - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
-            ) - Psv_l) / Rs_l
+            ) - Psv_l) / Rs_l # dVsa/dt
+    
     return dydt
 
 
+# time steps
+# forward euler time step
+h = 0.001
 T = np.linspace(0, 100, 1)
 n_t = len(T)
 
@@ -100,18 +104,22 @@ for t in T:
         Psv_u[t] = max(0, P_ra[t] - rho * g[t] * Hu)  # eq 15
         Psv_l[t] = max(P_ra, Pext_l) + rho*g[t]*Hl  # eq 18
 
-        Psa_u[t] = (Vsa[t] - Vsa0[0] + Csa_l*Pext_l[t] - Csa_l * rho * g[t]*H)/(
+        Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g[t]*H)/(
             Csa)  # eq 12
-        Psa_l[t] = (Vsa[t] - Vsa0[0] + Csa_l*Pext_l[t] - Csa_u * rho * g[t]*H)/(
+        Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g[t]*H)/(
             Csa)  # eq 13
 
-    # Case II
-    elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:
+        Vsa[t+1] = Vsa[t] + h* solve_Vsa(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u, Rs_l,
+                                         Csa_u, Pext_l[t], Psa_u[t], Psv_u[t],
+                                         Psv_l[t], rho, g[t], H, Q[t])
 
-        continue
-    # Case III
-    elif P_thorax[t] >= rho * g[t] * Hu - dP_RA:
-        continue
+    # # Case II
+    # elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:
+
+    #     continue
+    # # Case III
+    # elif P_thorax[t] >= rho * g[t] * Hu - dP_RA:
+    #     continue
 
 
 # def volume_odes(x,t):
