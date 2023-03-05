@@ -16,11 +16,11 @@ dP_RA = 2 * 1333
 height = 167.64
 
 Hu_patient = 32
-Hl_patient = -42
-lumped_height = Hu_patient + (-Hl_patient)
+Hl_patient = 42
+lumped_height = Hu_patient + Hl_patient
 
 Hu_factor = Hu_patient /lumped_height
-Hl_factor = - Hl_patient/lumped_height
+Hl_factor = Hl_patient/lumped_height
 
 rho = 1
 
