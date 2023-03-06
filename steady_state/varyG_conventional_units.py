@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
 
-G = np.linspace(g_earth,1.7*980, 3)
+G = np.linspace(g_earth,10*980, 300)
 
 P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
 
@@ -43,7 +43,7 @@ for j in range(len(P_thorax)):
             F = Q / (C_RVD * (P_RA[j] - P_thorax[j]))
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 44
             Ppa = Ppv + Q * Rp
-            Ppa_also = P_thorax[i] + (C_RVD / C_LVD) * dP_RA + Q*Rp
+            Ppa_also = P_thorax[j] + (C_RVD / C_LVD) * dP_RA + Q*Rp
             # assert (nabs(Ppa - Ppa_also) < 0.01)
             cases[j, i] = 1
         elif P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
@@ -64,7 +64,7 @@ for j in range(len(P_thorax)):
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
             F_also = (Gs * Psa_u_star +
-                      (1/Rs_l)* (rho*G[i]*Hu-P_thorax[i] - dP_RA)) / (
+                      (1/Rs_l)* (rho*G[i]*Hu-P_thorax[j] - dP_RA)) / (
                       C_RVD*dP_RA)
             # breakpoint()
             # assert F == F_also, "F, equation 64 inconsistent"
@@ -76,7 +76,7 @@ for j in range(len(P_thorax)):
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 66
             Ppa = Ppv + Q * Rp
             Ppa_also = (C_RVD / C_LVD) * dP_RA + Rp*(Gs*Psa_u_star + 1/Rs_l *
-                        (rho * G[i] *Hu - P_thorax[i] - dP_RA))
+                        (rho * G[i] *Hu - P_thorax[j] - dP_RA))
             # (Pdb) Ppa
             # 30219.708890709935
             # (Pdb) Ppa_also
