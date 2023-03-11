@@ -4,7 +4,7 @@ Purpose : simulate ode model
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
+from scipy.integrate import odeint, solve_ivp
 from parameters import *
 
 
@@ -72,9 +72,43 @@ def solve_Vsv(Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u,
             ) - Psv_l) / Rs_l # dVsv/dt
     return dydt
 
+
+def solve_ivp_Vsa(t, Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
+              Psv_l, rho, g, H, Q):
+    """ODE to solve for systemic arterial volume. Arguments are named below
+    For more detailed information about units see the parameters.py file
+
+    Args:
+        Vsa (np.array): systemic arterial volume
+        Vsa0 (float): reserve arterial volume
+        Csa (float): systemic arterial compliance
+        Csa_l (float): systemic upper arterial compliance
+        Rs_u (float): systemic upper venous resistance
+        Rs_l (float): systemic lower venous resistance
+        Csa_u (float): systemic upper arterial compliance
+        Pext_l (float): lower pressure external to vascular system
+        Psa_u (float): pressure in upper systemic arteries
+        Psv_u (float): pressure in upper systemic veins
+        Psv_l (float): pressure in lower systemic veins
+        rho (float): density of blood
+        g (float): value of gravity
+        H (float): total height
+        Q (float): cardiac output
+
+    Returns:
+        float: dVsa/dt[t]
+    """
+    dydt = Q - Vsa[t]/Csa*(1/Rs_u + 1/Rs_l) - (
+            ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
+            ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
+            ) - Psv_l) / Rs_l # dVsa/dt
+    
+    return dydt
+
+
 # time steps
 # forward euler time step
-h = 0.001
+h = 0.0001
 n_timesteps = 100
 num_seconds = 60
 T = np.linspace(0, num_seconds, num=n_timesteps)
@@ -171,18 +205,31 @@ for t in range(n_timesteps):
                     Csa)  # eq 13
 
         # h is euler iteration timestep
-        Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u,
+        Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
                                           Rs_l, Csa_u, Pext_l[t], Psa_u[t],
                                           Psv_u[t], Psv_l[t], rho, g[t], H,
                                           Q[t])
 
-        Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa0[t], Vsa[t], Csa, Csa_l, Rs_u,
+        Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa[t], Vsa0[t], Csa, Csa_l, Rs_u,
                                           Rs_l, Csa_u, Pext_l[t], Psa_u[t],
                                           Psv_u[t], Psv_l[t], rho, g[t], H,
                                           Q[t])
+        
 
         print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
-    
+        timvector = np.linspace(0,1,num=2)
+        t_interval = np.linspace(0, h, num=2)
+        print("t_interval ", t_interval, " timvector ", timvector)
+        Vsa_s[t+1] = solve_ivp(solve_ivp_Vsa, (0,1), [Vsa[t]],
+                                                            args=(Vsa0[t],
+                                                                Csa, Csa_l,
+                                                                Rs_u, Rs_l,
+                                                                Csa_u, Pext_l[t],
+                                                                Psa_u[t], Psv_u[t], 
+                                                                Psv_l[t], rho, g[t],
+                                                                H, Q[t]))
+        print("Vsa odeint ",Vsa_s[t+1] )
+        breakpoint()
 
     # # Case II
     # elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:z
