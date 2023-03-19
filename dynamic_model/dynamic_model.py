@@ -7,104 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 
-
-def solve_Vsa(Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
-              Psv_l, rho, g, H, Q):
-    """ODE to solve for systemic arterial volume. Arguments are named below
-    For more detailed information about units see the parameters.py file
-
-    Args:
-        Vsa (float): systemic arterial volume
-        Vsa0 (float): reserve arterial volume
-        Csa (float): systemic arterial compliance
-        Csa_l (float): systemic upper arterial compliance
-        Rs_u (float): systemic upper venous resistance
-        Rs_l (float): systemic lower venous resistance
-        Csa_u (float): systemic upper arterial compliance
-        Pext_l (float): lower pressure external to vascular system
-        Psa_u (float): pressure in upper systemic arteries
-        Psv_u (float): pressure in upper systemic veins
-        Psv_l (float): pressure in lower systemic veins
-        rho (float): density of blood
-        g (float): value of gravity
-        H (float): total height
-        Q (float): cardiac output
-
-    Returns:
-        float: dVsa/dt[t]
-    """
-    dydt = Q - Vsa/Csa*(1/Rs_u + 1/Rs_l) - (
-            ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
-            ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
-            ) - Psv_l) / Rs_l # dVsa/dt
-    
-    return dydt
-
-def solve_Vsv(Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
-              Psv_l, rho, g, H, Q):
-    """ODE to solve for systemic venous volume. Arguments are named below
-    For more detailed information about units see the parameters.py file
-    dVsv/dt = -dVsa/dt
-
-    Args:
-        Vsa (float): systemic arterial volume
-        Vsa0 (float): reserve arterial volume
-        Csa (float): systemic arterial compliance
-        Csa_l (float): systemic upper arterial compliance
-        Rs_u (float): systemic upper venous resistance
-        Rs_l (float): systemic lower venous resistance
-        Csa_u (float): systemic upper arterial compliance
-        Pext_l (float): lower pressure external to vascular system
-        Psa_u (float): pressure in upper systemic arteries
-        Psv_u (float): pressure in upper systemic veins
-        Psv_l (float): pressure in lower systemic veins
-        rho (float): density of blood
-        g (float): value of gravity
-        H (float): total height
-        Q (float): cardiac output
-
-    Returns:
-        float: dVsv/dt[t]
-    """
-    dydt = Q - Vsa/Csa*(1/Rs_u + 1/Rs_l) - (
-            ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
-            ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
-            ) - Psv_l) / Rs_l # dVsv/dt
-    return dydt
-
-
-def solve_ivp_Vsa(t, Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
-              Psv_l, rho, g, H, Q):
-    """ODE to solve for systemic arterial volume. Arguments are named below
-    For more detailed information about units see the parameters.py file
-
-    Args:
-        Vsa (np.array): systemic arterial volume
-        Vsa0 (float): reserve arterial volume
-        Csa (float): systemic arterial compliance
-        Csa_l (float): systemic upper arterial compliance
-        Rs_u (float): systemic upper venous resistance
-        Rs_l (float): systemic lower venous resistance
-        Csa_u (float): systemic upper arterial compliance
-        Pext_l (float): lower pressure external to vascular system
-        Psa_u (float): pressure in upper systemic arteries
-        Psv_u (float): pressure in upper systemic veins
-        Psv_l (float): pressure in lower systemic veins
-        rho (float): density of blood
-        g (float): value of gravity
-        H (float): total height
-        Q (float): cardiac output
-
-    Returns:
-        float: dVsa/dt[t]
-    """
-    dydt = Q - Vsa[t]/Csa*(1/Rs_u + 1/Rs_l) - (
-            ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
-            ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
-            ) - Psv_l) / Rs_l # dVsa/dt
-    
-    return dydt
-
+from volume_odes import *
 
 # time steps
 # forward euler time step
@@ -116,7 +19,7 @@ T = np.linspace(0, num_seconds, num=n_timesteps)
 
 # TODO : change to vary gravity as fn of time
 # breakpoint()
-g = g_earth*np.ones(n_timesteps)
+g_range = g_earth*np.ones(n_timesteps)
 
 # may want to make 2D in the future as we
 # vary gravity and/or other parameters
@@ -164,55 +67,57 @@ Vsv0 = np.zeros(n_timesteps)
 t_interval = np.linspace(0, h, num=1)
 
 for t in range(n_timesteps):
+    g = g_range[t]
+    P_thorax = P_thorax[t]
     # Case I:
-    dP_RA = P_ra[t] - P_thorax[t]
-    if P_thorax[t] <= - dP_RA:
+    dP_RA = P_ra[t] - P_thorax
+    if P_thorax <= - dP_RA:
         # eq 20 => six cases for Pra:
         # eq 20 gives Pra
-        if Pext_l[t] < rho * g[t] * Hu:
+        if Pext_l[t] < rho * g * Hu:
             if P_ra[t] <= Pext_l[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] -
-                           Csv_l*(rho*g[t]*Hl) +
-                           Cra * P_thorax[t]) / Cra
+                           Csv_l*(rho*g*Hl) +
+                           Cra * P_thorax) / Cra
             elif P_ra[t] >= Pext_l[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l *
-                           (rho * g[t] * Hl - Pext_l[t]) + Cra * P_thorax[t]
+                           (rho * g * Hl - Pext_l[t]) + Cra * P_thorax
                            ) / (Cra + Csv_l)
-            elif rho * g[t] * Hu <= P_ra:
+            elif rho * g * Hu <= P_ra:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
                            + Csv_u * rho * g * Hu + Cra *
                            P_thorax(t)) / (Cra + Csv_u + Csv_l)
         else:
-            if P_ra[t] <= rho * g[t] * Hu:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g[t] * Hl
+            if P_ra[t] <= rho * g * Hu:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
                                                        - Pext_l[t])
-                           + Cra * P_thorax[t] - Csv_l*Pext_l[t]) / Cra
-            elif P_ra[t] >= rho * g[t] * Hu:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g[t] * Hl +
-                           Csv_u * rho * g[t] * Hu + Cra * P_thorax[t]
+                           + Cra * P_thorax - Csv_l*Pext_l[t]) / Cra
+            elif P_ra[t] >= rho * g * Hu:
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g * Hl +
+                           Csv_u * rho * g * Hu + Cra * P_thorax
                            ) / (Cra + Csv_u)
             elif Pext_l[t] <= P_ra[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g[t] * Hl -
-                           Pext_l[t]) + Csv_u * rho * g[t] * Hu + Cra * P_thorax
+                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl -
+                           Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax
                            ) / (Cra + Csv_u + Csv_l)
 
-        Psv_u[t] = max(0, P_ra[t] - rho * g[t] * Hu)  # eq 15
-        Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g[t]*Hl  # eq 18
+        Psv_u[t] = max(0, P_ra[t] - rho * g * Hu)  # eq 15
+        Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g*Hl  # eq 18
 
-        Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g[t]*H)/(
+        Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g*H)/(
                     Csa)  # eq 12
-        Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g[t]*H)/(
+        Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
                     Csa)  # eq 13
 
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
                                           Rs_l, Csa_u, Pext_l[t], Psa_u[t],
-                                          Psv_u[t], Psv_l[t], rho, g[t], H,
+                                          Psv_u[t], Psv_l[t], rho, g, H,
                                           Q[t])
 
         Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa[t], Vsa0[t], Csa, Csa_l, Rs_u,
                                           Rs_l, Csa_u, Pext_l[t], Psa_u[t],
-                                          Psv_u[t], Psv_l[t], rho, g[t], H,
+                                          Psv_u[t], Psv_l[t], rho, g, H,
                                           Q[t])
         
 
@@ -220,23 +125,23 @@ for t in range(n_timesteps):
         timvector = np.linspace(0,1,num=2)
         t_interval = np.linspace(0, h, num=2)
         print("t_interval ", t_interval, " timvector ", timvector)
-        Vsa_s[t+1] = solve_ivp(solve_ivp_Vsa, (0,1), [Vsa[t]],
-                                                            args=(Vsa0[t],
-                                                                Csa, Csa_l,
-                                                                Rs_u, Rs_l,
-                                                                Csa_u, Pext_l[t],
-                                                                Psa_u[t], Psv_u[t], 
-                                                                Psv_l[t], rho, g[t],
-                                                                H, Q[t]))
-        print("Vsa odeint ",Vsa_s[t+1] )
+        # Vsa_s[t+1] = solve_ivp(solve_ivp_Vsa, (0,1), [Vsa[t]],
+        #                                                     args=(Vsa0[t],
+        #                                                         Csa, Csa_l,
+        #                                                         Rs_u, Rs_l,
+        #                                                         Csa_u, Pext_l[t],
+        #                                                         Psa_u[t], Psv_u[t], 
+        #                                                         Psv_l[t], rho, g,
+        #                                                         H, Q[t]))
+        # print("Vsa odeint ",Vsa_s[t+1] )
         breakpoint()
 
     # # Case II
-    # elif P_thorax[t] > - dP_RA and P_thorax[t] < rho * g[t] * Hu - dP_RA:z
+    # elif P_thorax > - dP_RA and P_thorax < rho * g * Hu - dP_RA:z
 
     #     continue
     # # Case III
-    # elif P_thorax[t] >= rho * g[t] * Hu - dP_RA:
+    # elif P_thorax >= rho * g * Hu - dP_RA:
     #     continue
 
 
