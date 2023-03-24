@@ -61,7 +61,7 @@ def solve_Vsv(Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u,
             ((-Vsa0 + Csa_l * Pext_l - Csa_l*rho*g*H)/Csa) - Psv_u) / Rs_u - (
             ((-Vsa0 + Csa_l * Pext_l - Csa_u*rho*g*H)/Csa
             ) - Psv_l) / Rs_l # dVsv/dt
-    return dydt
+    return - dydt
 
 
 def solve_ivp_Vsa(t, Vsa, Vsa0, Csa, Csa_l, Rs_u, Rs_l, Csa_u, Pext_l, Psa_u, Psv_u, 
