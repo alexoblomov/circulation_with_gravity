@@ -11,10 +11,10 @@ from volume_odes import *
 
 # time steps
 # forward euler time step
-h = 0.0001
 n_timesteps = 100
-num_seconds = 60
-T = np.linspace(0, num_seconds, num=n_timesteps)
+n_seconds = 30
+T = np.linspace(0, n_seconds, num=n_timesteps)
+h = n_seconds/n_timesteps
 # n_t = len(T)
 
 # TODO : change to vary gravity as fn of time
@@ -26,7 +26,7 @@ g_range = g_earth*np.ones(n_timesteps)
 
 Q = np.zeros(n_timesteps)
 
-F = np.zeros(n_timesteps)
+F = F_patient * np.ones(n_timesteps)
 P_ra = np.zeros(n_timesteps)
 Psv_u = np.zeros(n_timesteps)
 Psv_l = np.zeros(n_timesteps)
@@ -36,6 +36,7 @@ Pext_l = np.zeros(n_timesteps)
 
 # TODO consider moving to parameters.py
 P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
+dP_RA = np.zeros(n_timesteps)
 
 # TODO vary normally around the nominal values of the relative heights
 Hu = Hu_patient
@@ -43,7 +44,6 @@ Hl = Hl_patient
 H = Hu + Hl
 
 
-Q = C_RVD * F*(P_ra - P_thorax)
 
 # assume venous vol is roughly 70% of total BV.
 # TODO: make this a normal random variable centered around 70%
@@ -56,49 +56,45 @@ Vsa[0] = init_Vsa
 Vsv = np.zeros(n_timesteps+1)
 Vsv[0] = init_Vsv
 
-Vsa_s = np.zeros(n_timesteps+1)
-Vsv_s = np.zeros(n_timesteps+1)
 
 # reseve volumes
-Vsa0 = np.zeros(n_timesteps)
-Vsv0 = np.zeros(n_timesteps)
+Vsa0 = np.ones(n_timesteps) * 0.5 * VT0_steady_state_cntrl
+Vsv0 = np.ones(n_timesteps) * 0.5 * VT0_steady_state_cntrl
 
-# for solving for vsa/vsv with odeint
-t_interval = np.linspace(0, h, num=1)
 
 for t in range(n_timesteps):
     g = g_range[t]
-    P_thorax = P_thorax[t]
+
     # Case I:
-    dP_RA = P_ra[t] - P_thorax
-    if P_thorax <= - dP_RA:
+    dP_RA[t] = P_ra[t] - P_thorax[t]
+    if P_thorax[t]<= - dP_RA[t]:
         # eq 20 => six cases for Pra:
         # eq 20 gives Pra
         if Pext_l[t] < rho * g * Hu:
             if P_ra[t] <= Pext_l[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] -
                            Csv_l*(rho*g*Hl) +
-                           Cra * P_thorax) / Cra
+                           Cra * P_thorax[t]) / Cra
             elif P_ra[t] >= Pext_l[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l *
-                           (rho * g * Hl - Pext_l[t]) + Cra * P_thorax
+                           (rho * g * Hl - Pext_l[t]) + Cra * P_thorax[t]
                            ) / (Cra + Csv_l)
             elif rho * g * Hu <= P_ra:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
                            + Csv_u * rho * g * Hu + Cra *
-                           P_thorax(t)) / (Cra + Csv_u + Csv_l)
+                           P_thorax[t]) / (Cra + Csv_u + Csv_l)
         else:
             if P_ra[t] <= rho * g * Hu:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
                                                        - Pext_l[t])
-                           + Cra * P_thorax - Csv_l*Pext_l[t]) / Cra
+                           + Cra * P_thorax[t]- Csv_l*Pext_l[t]) / Cra
             elif P_ra[t] >= rho * g * Hu:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g * Hl +
-                           Csv_u * rho * g * Hu + Cra * P_thorax
+                           Csv_u * rho * g * Hu + Cra * P_thorax[t]
                            ) / (Cra + Csv_u)
             elif Pext_l[t] <= P_ra[t]:
                 P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl -
-                           Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax
+                           Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax[t]
                            ) / (Cra + Csv_u + Csv_l)
 
         Psv_u[t] = max(0, P_ra[t] - rho * g * Hu)  # eq 15
@@ -108,7 +104,9 @@ for t in range(n_timesteps):
                     Csa)  # eq 12
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
                     Csa)  # eq 13
-
+        
+        # Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
+        Q[t] = 500
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
                                           Rs_l, Csa_u, Pext_l[t], Psa_u[t],
@@ -122,26 +120,50 @@ for t in range(n_timesteps):
         
 
         print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
-        timvector = np.linspace(0,1,num=2)
-        t_interval = np.linspace(0, h, num=2)
-        print("t_interval ", t_interval, " timvector ", timvector)
-        # Vsa_s[t+1] = solve_ivp(solve_ivp_Vsa, (0,1), [Vsa[t]],
-        #                                                     args=(Vsa0[t],
-        #                                                         Csa, Csa_l,
-        #                                                         Rs_u, Rs_l,
-        #                                                         Csa_u, Pext_l[t],
-        #                                                         Psa_u[t], Psv_u[t], 
-        #                                                         Psv_l[t], rho, g,
-        #                                                         H, Q[t]))
-        # print("Vsa odeint ",Vsa_s[t+1] )
-        breakpoint()
-
     # # Case II
-    # elif P_thorax > - dP_RA and P_thorax < rho * g * Hu - dP_RA:z
+    # elif P_thorax[t]> - dP_RA[t] and P_thorax[t]< rho * g * Hu - dP_RA[t]:z
 
     #     continue
     # # Case III
-    # elif P_thorax >= rho * g * Hu - dP_RA:
+    # elif P_thorax[t]>= rho * g * Hu - dP_RA[t]:
     #     continue
+# breakpoint()
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 
+dynes_2_mmhg = 1/1333
+fig = plt.figure(constrained_layout=False)
+x = np.arange(0, 10, 0.2)
+y = np.sin(x)
+gs = gridspec.GridSpec(2, 3, figure=fig)
+ax1 = fig.add_subplot(gs[0, 0])
+# identical to ax1 = plt.subplot(gs.new_subplotspec((0, 0), colspan=3))
+ax2 = fig.add_subplot(gs[0, 1])
+ax3 = fig.add_subplot(gs[1, 0])
+ax4 = fig.add_subplot(gs[1, 1])
+ax5 = fig.add_subplot(gs[1, 2])
+ax6 = fig.add_subplot(gs[0, 2])
+
+ax1.plot(T, Vsa[:-1], label='Vsa')
+ax1.set_ylabel("ml")
+# ax1.set_title("Vsa")
+ax1.legend()
+ax2.plot(T, Vsv[:-1], label='Vsv')
+ax1.set_ylabel("ml")
+# ax2.set_title('Vsv')
+ax3.plot(T, Psa_u*dynes_2_mmhg, label='Psa_u')
+# ax3.set_title("Psa_u")
+ax3.set_ylabel("mmHg")
+ax3.legend()
+ax4.plot(T, Psa_l*dynes_2_mmhg, label ='Psa_l')
+# ax4.set_title("Psa_l")
+ax4.legend()
+ax5.plot(T, P_ra*dynes_2_mmhg, label='Pra')
+# ax5.set_title("Pra")
+ax5.legend()
+
+ax6.plot(T, Q, label='Q')
+# ax5.set_title("Pra")
+ax6.legend()
+plt.savefig('model_results.png')
 

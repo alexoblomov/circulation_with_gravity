@@ -156,7 +156,7 @@ sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
 # xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 # xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
 
-
+breakpoint()
 plt.figure(figsize=(15, 12))
 plt.subplots_adjust(hspace=0.5)
 plt.suptitle("Reserve volume vs g", fontsize=18, y=0.95)
