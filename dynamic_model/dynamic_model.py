@@ -4,10 +4,12 @@ Purpose : simulate ode model
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
-
 from volume_odes import *
+from controller import get_heart_rate
+
 
 # time steps
 # forward euler time step
@@ -26,7 +28,15 @@ g_range = g_earth*np.ones(n_timesteps)
 
 Q = np.zeros(n_timesteps)
 
-F = F_patient * np.ones(n_timesteps)
+# uncontrolled
+# F = F_patient * np.ones(n_timesteps)
+
+# controlled
+F = get_heart_rate(Psa_u_star, F_max, F_min, P_sa_u_max,
+                   P_sa_u_min) * np.ones(n_timesteps)
+breakpoint()
+
+
 P_ra = np.zeros(n_timesteps)
 Psv_u = np.zeros(n_timesteps)
 Psv_l = np.zeros(n_timesteps)
@@ -56,10 +66,9 @@ Vsa[0] = init_Vsa
 Vsv = np.zeros(n_timesteps+1)
 Vsv[0] = init_Vsv
 
-
 # reseve volumes
-Vsa0 = np.ones(n_timesteps) * 0.5 * VT0_steady_state_cntrl
-Vsv0 = np.ones(n_timesteps) * 0.5 * VT0_steady_state_cntrl
+Vsa0 = np.ones(n_timesteps) * (1-pct_venous )* VT0_steady_state_cntrl
+Vsv0 = np.ones(n_timesteps) * pct_venous * VT0_steady_state_cntrl
 
 
 for t in range(n_timesteps):
@@ -105,8 +114,8 @@ for t in range(n_timesteps):
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
                     Csa)  # eq 13
         
-        # Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
-        Q[t] = 500
+        Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
+        # Q[t] = 500
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
                                           Rs_l, Csa_u, Pext_l[t], Psa_u[t],
@@ -128,9 +137,9 @@ for t in range(n_timesteps):
     # elif P_thorax[t]>= rho * g * Hu - dP_RA[t]:
     #     continue
 # breakpoint()
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 
+
+Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
 fig = plt.figure(constrained_layout=False)
 x = np.arange(0, 10, 0.2)
@@ -167,3 +176,5 @@ ax6.plot(T, Q, label='Q')
 ax6.legend()
 plt.savefig('model_results.png')
 
+p_range = np.linspace(0, P_sa_u_max)
+f_range = np.array([get_heart_rate(p) for p in p_range])

@@ -58,10 +58,14 @@ Ts = Csa_u * Rs_u
 Tp = Rp * Cpa
 Csa = Csa_u + Csa_l
 
-F_patient = 60 / 60 # beats per second
+F_patient = 50 / 60 # beats per second
 
 # at G_earth
-# VT0_steady_state_cntrl = 1.6785631 * 1000
-VT0_steady_state_cntrl = 0.01 * 1000
+VT0_steady_state_cntrl = 1.6785631 * 1000
+# VT0_steady_state_cntrl = 0.01 * 1000
 
 # else need to simulate and input VTO array vs G
+P_sa_u_min = 15 *1333 # mmhg
+P_sa_u_max = 180 *1333 # mmhg
+F_max = 195 / 60 # bps
+F_min = 40 / 60
