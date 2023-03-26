@@ -69,3 +69,6 @@ P_sa_u_min = 15 *1333 # mmhg
 P_sa_u_max = 180 *1333 # mmhg
 F_max = 195 / 60 # bps
 F_min = 40 / 60
+# try parametrizing controller with pairs (P*, F*), (P_min, F_min)
+F_star = 50 / 60
+Psa_u_star = Psa_u_star

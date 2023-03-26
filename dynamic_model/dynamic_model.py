@@ -8,7 +8,7 @@ import matplotlib.gridspec as gridspec
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 from volume_odes import *
-from controller import get_heart_rate
+from controller import get_heart_rate, get_HR
 
 
 # time steps
@@ -32,10 +32,10 @@ Q = np.zeros(n_timesteps)
 # F = F_patient * np.ones(n_timesteps)
 
 # controlled
-F = get_heart_rate(Psa_u_star, F_max, F_min, P_sa_u_max,
-                   P_sa_u_min) * np.ones(n_timesteps)
-breakpoint()
-
+# F = get_heart_rate(Psa_u_star, F_max, F_min, P_sa_u_max,
+#                    P_sa_u_min) * np.ones(n_timesteps)
+# F = get_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
+#                    P_sa_u_min) * np.ones(n_timesteps)
 
 P_ra = np.zeros(n_timesteps)
 Psv_u = np.zeros(n_timesteps)
@@ -43,6 +43,7 @@ Psv_l = np.zeros(n_timesteps)
 Psa_u = np.zeros(n_timesteps)
 Psa_l = np.zeros(n_timesteps)
 Pext_l = np.zeros(n_timesteps)
+F = np.zeros(n_timesteps) # set by controller inside loop
 
 # TODO consider moving to parameters.py
 P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
@@ -114,6 +115,9 @@ for t in range(n_timesteps):
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
                     Csa)  # eq 13
         
+        F[t] = get_HR(Psa_u[t], F_star, F_min, Psa_u_star,
+                   P_sa_u_min)
+        print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
         # Q[t] = 500
         # h is euler iteration timestep
@@ -142,8 +146,7 @@ for t in range(n_timesteps):
 Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
 fig = plt.figure(constrained_layout=False)
-x = np.arange(0, 10, 0.2)
-y = np.sin(x)
+
 gs = gridspec.GridSpec(2, 3, figure=fig)
 ax1 = fig.add_subplot(gs[0, 0])
 # identical to ax1 = plt.subplot(gs.new_subplotspec((0, 0), colspan=3))
@@ -153,28 +156,35 @@ ax4 = fig.add_subplot(gs[1, 1])
 ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 
-ax1.plot(T, Vsa[:-1], label='Vsa')
+start = 40
+ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
 ax1.legend()
-ax2.plot(T, Vsv[:-1], label='Vsv')
-ax1.set_ylabel("ml")
+ax2.plot(T[start:], Vsv[start:-1], label='Vsv')
+ax2.legend()
+
 # ax2.set_title('Vsv')
-ax3.plot(T, Psa_u*dynes_2_mmhg, label='Psa_u')
+ax3.plot(T[start:], Psa_u[start:]*dynes_2_mmhg, label='Psa_u')
 # ax3.set_title("Psa_u")
 ax3.set_ylabel("mmHg")
 ax3.legend()
-ax4.plot(T, Psa_l*dynes_2_mmhg, label ='Psa_l')
+ax4.plot(T[start:], Psa_l[start:]*dynes_2_mmhg, label ='Psa_l')
 # ax4.set_title("Psa_l")
 ax4.legend()
-ax5.plot(T, P_ra*dynes_2_mmhg, label='Pra')
+ax5.plot(T[start:], P_ra[start:]*dynes_2_mmhg, label='Pra')
 # ax5.set_title("Pra")
 ax5.legend()
 
-ax6.plot(T, Q, label='Q')
+ax6.plot(T[start:], Q[start:], label='Q')
 # ax5.set_title("Pra")
+ax6.set_ylabel("L/min")
 ax6.legend()
-plt.savefig('model_results.png')
+plt.savefig('controlled_model_results.png')
 
 p_range = np.linspace(0, P_sa_u_max)
-f_range = np.array([get_heart_rate(p) for p in p_range])
+f_range = np.array([get_HR(p, F_star, F_min, Psa_u_star, 
+                                   P_sa_u_min) for p in p_range])
+plt.figure()
+plt.plot(p_range, f_range)
+plt.savefig("P_vs_F_controller.png")
