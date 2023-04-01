@@ -152,7 +152,7 @@ ax4 = fig.add_subplot(gs[1, 1])
 ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 
-start = 40
+start = 0
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
