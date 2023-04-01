@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_heart_rate(Psa_u_star, F_max, F_min, P_max, P_min):
+def get_heart_rate(dPsa, F_max, F_min, P_max, P_min):
     """return a linear function of heart rate F in terms of pressure
 
     Args:
@@ -13,7 +13,8 @@ def get_heart_rate(Psa_u_star, F_max, F_min, P_max, P_min):
     """
     m = (F_min - F_max) / (P_max - P_min)
     b = F_max - m*P_max
-    F = m*Psa_u_star + b
+    # b = F_star - m*Psa_u_star
+    F = m*dPsa + b
     
     return F
 

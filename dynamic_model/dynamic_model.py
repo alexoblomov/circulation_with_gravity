@@ -115,8 +115,10 @@ for t in range(n_timesteps):
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
                     Csa)  # eq 13
         
-        F[t] = get_HR(Psa_u[t], F_star, F_min, Psa_u_star,
-                   P_sa_u_min)
+        # F[t] = get_HR(Psa_u[t], F_star, F_min, Psa_u_star,
+        #            P_sa_u_min)
+        dPsa = (Psa_u[t] - Psa_u_star)
+        F[t] = get_heart_rate(dPsa, F_star, F_min, Psa_u_star, P_sa_u_min)
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
         # Q[t] = 500
@@ -156,7 +158,7 @@ ax4 = fig.add_subplot(gs[1, 1])
 ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 
-start = 40
+start = 0
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
@@ -183,7 +185,9 @@ ax6.legend()
 plt.savefig('controlled_model_results.png')
 
 p_range = np.linspace(0, P_sa_u_max)
-f_range = np.array([get_HR(p, F_star, F_min, Psa_u_star, 
+# f_range = np.array([get_HR(p, F_star, F_min, Psa_u_star, 
+#                                    P_sa_u_min) for p in p_range])
+f_range = np.array([get_heart_rate(p, F_star, F_min, Psa_u_star, 
                                    P_sa_u_min) for p in p_range])
 plt.figure()
 plt.plot(p_range, f_range)
