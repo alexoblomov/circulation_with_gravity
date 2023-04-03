@@ -8,7 +8,9 @@ import matplotlib.gridspec as gridspec
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 from volume_odes import *
-from controller import get_heart_rate, get_HR
+from controller import get_linear_heart_rate, get_exp_heart_rate
+
+control_type = "exp" # linear or exp -- which controller we call
 
 
 # time steps
@@ -17,42 +19,37 @@ n_timesteps = 100
 n_seconds = 30
 T = np.linspace(0, n_seconds, num=n_timesteps)
 h = n_seconds/n_timesteps
-# n_t = len(T)
 
 # TODO : change to vary gravity as fn of time
 # breakpoint()
+# INPUTS 
 g_range = g_earth*np.ones(n_timesteps)
-
-# may want to make 2D in the future as we
-# vary gravity and/or other parameters
-
-Q = np.zeros(n_timesteps)
-
-# uncontrolled
-# F = F_patient * np.ones(n_timesteps)
-
-# controlled
-# F = get_heart_rate(Psa_u_star, F_max, F_min, P_sa_u_max,
-#                    P_sa_u_min) * np.ones(n_timesteps)
-# F = get_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
-#                    P_sa_u_min) * np.ones(n_timesteps)
-
-P_ra = np.zeros(n_timesteps)
-Psv_u = np.zeros(n_timesteps)
-Psv_l = np.zeros(n_timesteps)
-Psa_u = np.zeros(n_timesteps)
-Psa_l = np.zeros(n_timesteps)
-Pext_l = np.zeros(n_timesteps)
-F = np.zeros(n_timesteps) # set by controller inside loop
-
-# TODO consider moving to parameters.py
+Pext_l = Pext * np.ones(n_timesteps)
 P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
-dP_RA = np.zeros(n_timesteps)
+
 
 # TODO vary normally around the nominal values of the relative heights
 Hu = Hu_patient
 Hl = Hl_patient
 H = Hu + Hl
+
+
+# may want to make the following 2D in the future as we
+# vary gravity and/or other parameters
+
+# OUTPUTS
+Q = np.zeros(n_timesteps)
+P_ra = np.zeros(n_timesteps)
+Psv_u = np.zeros(n_timesteps)
+Psv_l = np.zeros(n_timesteps)
+Psa_u = np.zeros(n_timesteps)
+Psa_l = np.zeros(n_timesteps)
+F = np.zeros(n_timesteps) # set by controller inside loop
+
+# TODO consider moving to parameters.py
+dP_RA = np.zeros(n_timesteps)
+dP_RA[0] = init_dP_RA
+
 
 
 
@@ -115,10 +112,15 @@ for t in range(n_timesteps):
         Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
                     Csa)  # eq 13
         
-        # F[t] = get_HR(Psa_u[t], F_star, F_min, Psa_u_star,
-        #            P_sa_u_min)
+
         dPsa = (Psa_u[t] - Psa_u_star)
-        F[t] = get_heart_rate(dPsa, F_star, F_min, Psa_u_star, P_sa_u_min)
+        if control_type == "linear":
+            F[t] = get_linear_heart_rate(dPsa, F_star, F_min, Psa_u_star, P_sa_u_min)
+            # fit curve through max points and starred points doesn't work. maybe simple point slope rewrite
+            # F[t] = get_linear_heart_rate(dPsa, F_star, F_max, Psa_u_star, P_sa_u_max) # not work
+        elif control_type == "exp":
+            F[t] = get_exp_heart_rate(dPsa, Psa_u_star, F_star)
+        
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
         # Q[t] = 500
@@ -149,7 +151,7 @@ Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
 fig = plt.figure(constrained_layout=False)
 
-gs = gridspec.GridSpec(2, 3, figure=fig)
+gs = gridspec.GridSpec(3, 3, figure=fig)
 ax1 = fig.add_subplot(gs[0, 0])
 # identical to ax1 = plt.subplot(gs.new_subplotspec((0, 0), colspan=3))
 ax2 = fig.add_subplot(gs[0, 1])
@@ -157,8 +159,9 @@ ax3 = fig.add_subplot(gs[1, 0])
 ax4 = fig.add_subplot(gs[1, 1])
 ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
+ax7 = fig.add_subplot(gs[2, 0])
 
-start = 0
+start = 20
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
@@ -179,15 +182,22 @@ ax5.plot(T[start:], P_ra[start:]*dynes_2_mmhg, label='Pra')
 ax5.legend()
 
 ax6.plot(T[start:], Q[start:], label='Q')
-# ax5.set_title("Pra")
 ax6.set_ylabel("L/min")
 ax6.legend()
-plt.savefig('controlled_model_results.png')
+
+ax7.plot(T, F*60, label='F')
+ax7.set_ylabel("B/min")
+ax7.legend()
+
+fig.tight_layout()
+
+title = control_type + '_control_dynamic_model.png'
+plt.savefig(title)
 
 p_range = np.linspace(0, P_sa_u_max)
-# f_range = np.array([get_HR(p, F_star, F_min, Psa_u_star, 
+# f_range = np.array([get_exp_heart_rate(p, F_star, F_min, Psa_u_star, 
 #                                    P_sa_u_min) for p in p_range])
-f_range = np.array([get_heart_rate(p, F_star, F_min, Psa_u_star, 
+f_range = np.array([get_linear_heart_rate(p, F_star, F_min, Psa_u_star, 
                                    P_sa_u_min) for p in p_range])
 plt.figure()
 plt.plot(p_range, f_range)
