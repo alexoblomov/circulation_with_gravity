@@ -12,10 +12,9 @@ Ts, the time constant is in seconds
 Psa_u_star = 100 * 1333
 
 Psa_u = Psa_u_star
-dP_RA = 2 * 1333
-height = 167.64
+init_dP_RA = 2 * 1333 # (dynes/cm2)
 
-Hu_patient = 32
+Hu_patient = 32 # cm
 Hl_patient = 42
 lumped_height = Hu_patient + Hl_patient
 
@@ -23,10 +22,11 @@ Hu_factor = Hu_patient /lumped_height
 Hl_factor = Hl_patient/lumped_height
 
 rho = 1
+Pext = 0 #760 *1333 # 1 atmosphere = 760 mmhg  * 1333 -> dynes/cm2
 
-g_earth = 980
+g_earth = 980 # cm/s2
 
-Rs = (16.49) * 1333 / (1000 / 60)
+Rs = (16.49) * 1333 / (1000 / 60) # (dynes/cm2)/(cm^3/s)
 
 Gs = 1 / Rs
 Gs_u = Hu_factor * Gs
@@ -62,13 +62,19 @@ F_patient = 50 / 60 # beats per second
 
 # at G_earth
 VT0_steady_state_cntrl = 1.6785631 * 1000
-# VT0_steady_state_cntrl = 0.01 * 1000
+# VT0_steady_state_cntrl = 0.05 * 1000
 
 # else need to simulate and input VTO array vs G
 P_sa_u_min = 15 *1333 # mmhg
 P_sa_u_max = 180 *1333 # mmhg
 F_max = 195 / 60 # bps
 F_min = 40 / 60
+
+# P_sa_u_min = 30 *1333 # mmhg
+# P_sa_u_max = 170 *1333 # mmhg
+# F_max = 180 / 60 # bps
+# F_min = 40 / 60
+
 # try parametrizing controller with pairs (P*, F*), (P_min, F_min)
 F_star = 50 / 60
 Psa_u_star = Psa_u_star
