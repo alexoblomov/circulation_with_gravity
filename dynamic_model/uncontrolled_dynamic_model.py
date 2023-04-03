@@ -8,7 +8,7 @@ import matplotlib.gridspec as gridspec
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 from volume_odes import *
-from controller import get_heart_rate, get_HR
+from controller import get_linear_heart_rate
 
 
 # time steps
@@ -17,26 +17,26 @@ n_timesteps = 100
 n_seconds = 30
 T = np.linspace(0, n_seconds, num=n_timesteps)
 h = n_seconds/n_timesteps
-# n_t = len(T)
 
+
+#INPUTS
 # TODO : change to vary gravity as fn of time
 # breakpoint()
 g_range = g_earth*np.ones(n_timesteps)
+F = get_linear_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
+                   P_sa_u_min) * np.ones(n_timesteps)
+P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
 
+# TODO vary normally around the nominal values of the relative heights
+Hu = Hu_patient
+Hl = Hl_patient
+H = Hu + Hl
+
+
+# OUTPUTS
 # may want to make 2D in the future as we
 # vary gravity and/or other parameters
-
 Q = np.zeros(n_timesteps)
-
-# uncontrolled
-# F = F_patient * np.ones(n_timesteps)
-
-# controlled
-# F = get_heart_rate(Psa_u_star, F_max, F_min, P_sa_u_max,
-#                    P_sa_u_min) * np.ones(n_timesteps)
-F = get_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
-                   P_sa_u_min) * np.ones(n_timesteps)
-
 P_ra = np.zeros(n_timesteps)
 Psv_u = np.zeros(n_timesteps)
 Psv_l = np.zeros(n_timesteps)
@@ -44,14 +44,9 @@ Psa_u = np.zeros(n_timesteps)
 Psa_l = np.zeros(n_timesteps)
 Pext_l = np.zeros(n_timesteps)
 
-# TODO consider moving to parameters.py
-P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
-dP_RA = np.zeros(n_timesteps)
 
-# TODO vary normally around the nominal values of the relative heights
-Hu = Hu_patient
-Hl = Hl_patient
-H = Hu + Hl
+dP_RA = np.zeros(n_timesteps)
+dP_RA[0] = init_dP_RA
 
 
 
@@ -143,7 +138,7 @@ Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
 fig = plt.figure(constrained_layout=False)
 
-gs = gridspec.GridSpec(2, 3, figure=fig)
+gs = gridspec.GridSpec(3, 3, figure=fig)
 ax1 = fig.add_subplot(gs[0, 0])
 # identical to ax1 = plt.subplot(gs.new_subplotspec((0, 0), colspan=3))
 ax2 = fig.add_subplot(gs[0, 1])
@@ -151,30 +146,34 @@ ax3 = fig.add_subplot(gs[1, 0])
 ax4 = fig.add_subplot(gs[1, 1])
 ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
+ax7 = fig.add_subplot(gs[2, 0])
 
-start = 0
+start = 20
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
-# ax1.set_title("Vsa")
 ax1.legend()
 ax2.plot(T[start:], Vsv[start:-1], label='Vsv')
 ax2.legend()
 
-# ax2.set_title('Vsv')
 ax3.plot(T[start:], Psa_u[start:]*dynes_2_mmhg, label='Psa_u')
-# ax3.set_title("Psa_u")
+
 ax3.set_ylabel("mmHg")
 ax3.legend()
 ax4.plot(T[start:], Psa_l[start:]*dynes_2_mmhg, label ='Psa_l')
-# ax4.set_title("Psa_l")
+
 ax4.legend()
 ax5.plot(T[start:], P_ra[start:]*dynes_2_mmhg, label='Pra')
-# ax5.set_title("Pra")
 ax5.legend()
 
 ax6.plot(T[start:], Q[start:], label='Q')
-# ax5.set_title("Pra")
 ax6.set_ylabel("L/min")
 ax6.legend()
-plt.savefig('un_controlled_model_results.png')
 
+ax7.plot(T, F*60, label='F')
+ax7.set_ylabel("B/min")
+ax7.legend()
+
+fig.tight_layout()
+
+title = 'uncontrolled_dynamic_model.png'
+plt.savefig(title)
