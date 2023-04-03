@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_heart_rate(dPsa, F_max, F_min, P_max, P_min):
+def get_linear_heart_rate(dPsa, F_max, F_min, P_max, P_min):
     """return a linear function of heart rate F in terms of pressure
 
     Args:
@@ -18,7 +18,7 @@ def get_heart_rate(dPsa, F_max, F_min, P_max, P_min):
     
     return F
 
-def get_HR(Psa, Psa_star, F_star, F_max, F_min):
+def get_exp_heart_rate(dPsa, Psa_star, F_star):
     """returns new F
 
     Args:
@@ -26,11 +26,9 @@ def get_HR(Psa, Psa_star, F_star, F_max, F_min):
         P_sa_star (_type_): _description_
         F_prev (_type_): _description_
     """
-    # if (P_sa < P_sa_star) and (F < F_max):
-    #     F = F_prev + 10
-    # elif (P_sa > P_sa_star) and:
+
     d = (F_star - np.exp(-Psa_star))
     # c = np.log(F_star - d) + Psa_star
-    F = np.exp(-Psa) + d
+    F = np.exp(-dPsa) + d
 
     return F
