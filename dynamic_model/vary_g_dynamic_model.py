@@ -18,14 +18,25 @@ path = Path("dynamic_model/g_profiles")
 fname = path / "NASTAR_100percent.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
-end_timestep = 100
+breakpoint()
+# end_timestep = 100
+# T = T[:end_timestep]
+# g_range = g_range[:end_timestep]
+
+end_timestep = 1000
+nth_item = 30
 T = T[:end_timestep]
+T = T[0::nth_item]
+
 g_range = g_range[:end_timestep]
+g_range = g_range[0::nth_item]
+
 n_timesteps = len(T)
 n_seconds = int(T[-1])
 h = n_seconds/n_timesteps
 
-print("new h ", h)
+breakpoint()
+print("n_timesteps, ", n_timesteps, " n_seconds, ", n_seconds, "h, ", h)
 
 
 Pext_l = Pext * np.ones(n_timesteps)

@@ -10,7 +10,7 @@ from parameters import *
 from volume_odes import *
 from controller import get_linear_heart_rate, get_exp_heart_rate
 
-control_type = "exp" # linear or exp -- which controller we call
+control_type = "linear" # linear or exp -- which controller we call
 
 
 # time steps
@@ -161,7 +161,7 @@ ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 ax7 = fig.add_subplot(gs[2, 0])
 
-start = 20
+start = 0
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
@@ -197,8 +197,8 @@ plt.savefig(title)
 p_range = np.linspace(0, P_sa_u_max)
 # f_range = np.array([get_exp_heart_rate(p, F_star, F_min, Psa_u_star, 
 #                                    P_sa_u_min) for p in p_range])
-f_range = np.array([get_linear_heart_rate(p, F_star, F_min, Psa_u_star, 
-                                   P_sa_u_min) for p in p_range])
-plt.figure()
-plt.plot(p_range, f_range)
-plt.savefig("P_vs_F_controller.png")
+# f_range = np.array([get_linear_heart_rate(p, F_star, F_min, Psa_u_star, 
+#                                    P_sa_u_min) for p in p_range])
+# plt.figure()
+# plt.plot(p_range, f_range)
+# plt.savefig("P_vs_F_controller.png")

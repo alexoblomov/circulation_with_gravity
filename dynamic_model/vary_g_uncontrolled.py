@@ -17,13 +17,19 @@ path = Path("dynamic_model/g_profiles")
 fname = path / "NASTAR_100percent.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
-end_timestep = 100
+breakpoint()
+end_timestep = 1000
+nth_item = 30
 T = T[:end_timestep]
+T = T[0::nth_item]
+
 g_range = g_range[:end_timestep]
+g_range = g_range[0::nth_item]
+
 n_timesteps = len(T)
 n_seconds = int(T[-1])
 h = n_seconds/n_timesteps
-
+print("n_timesteps, ", n_timesteps, " n_seconds, ", n_seconds, "h, ", h)
 breakpoint()
 # # time steps
 # # forward euler time step
@@ -59,10 +65,11 @@ Psa_l = np.zeros(n_timesteps)
 Pext_l = np.zeros(n_timesteps)
 
 
-dP_RA = np.zeros(n_timesteps)
-dP_RA[0] = init_dP_RA
+# dP_RA = np.zeros(n_timesteps)
+# dP_RA[0] = init_dP_RA
 
-
+dP_RA = init_dP_RA * np.ones(n_timesteps)
+# dP_RA[0] = init_dP_RA
 
 # assume venous vol is roughly 70% of total BV.
 # TODO: make this a normal random variable centered around 70%
@@ -162,7 +169,7 @@ ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 ax7 = fig.add_subplot(gs[2, 0])
 
-start = 20
+start = 30
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 ax1.legend()
