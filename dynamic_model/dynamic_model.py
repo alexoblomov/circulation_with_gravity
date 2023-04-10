@@ -8,7 +8,8 @@ import matplotlib.gridspec as gridspec
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 from volume_odes import *
-from controller import get_linear_heart_rate, get_exp_heart_rate
+from controller import (get_linear_heart_rate, get_exp_heart_rate,
+                        get_lower_peripheral_resistance)
 
 control_type = "linear" # linear or exp -- which controller we call
 
@@ -123,6 +124,9 @@ for t in range(n_timesteps):
         
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
+
+        Rs_l = get_lower_peripheral_resistance(dPsa, Psa_u_star, Rs_l_star,
+                                               Rs_l_min, P_sa_u_min)
         # Q[t] = 500
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
