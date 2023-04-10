@@ -15,11 +15,11 @@ control_type = "linear" # linear or exp -- which controller we call
 
 # time steps
 # forward euler time step
-n_timesteps = 100
-n_seconds = 30
-T = np.linspace(0, n_seconds, num=n_timesteps)
+n_timesteps = 1000
+n_seconds = 10
+T = np.linspace(0.01, n_seconds, num=n_timesteps)
 h = n_seconds/n_timesteps
-
+breakpoint()
 # TODO : change to vary gravity as fn of time
 # breakpoint()
 # INPUTS 

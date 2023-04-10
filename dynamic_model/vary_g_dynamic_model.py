@@ -19,23 +19,24 @@ fname = path / "NASTAR_100percent.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
 breakpoint()
-# end_timestep = 100
-# T = T[:end_timestep]
-# g_range = g_range[:end_timestep]
-
-end_timestep = 1000
-nth_item = 30
+end_timestep = 7498
 T = T[:end_timestep]
-T = T[0::nth_item]
-
 g_range = g_range[:end_timestep]
-g_range = g_range[0::nth_item]
 
+# end_timestep = 1000
+# nth_item = 30
+# T = T[:end_timestep]
+# T = T[0::nth_item]
+
+# g_range = g_range[:end_timestep]
+# g_range = g_range[0::nth_item]
+
+g_range = g_earth * g_range
 n_timesteps = len(T)
 n_seconds = int(T[-1])
 h = n_seconds/n_timesteps
 
-breakpoint()
+# breakpoint()
 print("n_timesteps, ", n_timesteps, " n_seconds, ", n_seconds, "h, ", h)
 
 
@@ -138,6 +139,8 @@ for t in range(n_timesteps):
         
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
+
+        
         # Q[t] = 500
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
@@ -164,7 +167,8 @@ for t in range(n_timesteps):
 
 Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
-g_range = g_range/100
+# g_range = g_range/100
+g_range = g_range / g_earth
 
 fig = plt.figure(constrained_layout=False)
 
@@ -209,7 +213,7 @@ ax7.set_ylabel("B/min")
 ax7.legend()
 
 ax8.plot(T, g_range, label='g')
-ax8.set_ylabel("m/s2")
+ax8.set_ylabel("x G")
 ax8.legend()
 
 fig.tight_layout()

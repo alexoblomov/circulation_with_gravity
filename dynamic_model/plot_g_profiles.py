@@ -4,7 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 path = Path("dynamic_model/g_profiles")
-fname = path / "Run1_Gz.csv"
+# fname = path / "1_Gz.csv"
+fname = path / "1_Gz.csv"
 # with open(fname, newline='') as csvfile:
     # data = list(csv.reader(csvfile))
 
@@ -26,4 +27,4 @@ plt.figure()
 plt.plot(t, gz)
 plt.savefig("g_1_profile.png")
 print(df)
-# breakpoint()
+breakpoint()

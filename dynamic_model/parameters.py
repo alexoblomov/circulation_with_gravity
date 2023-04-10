@@ -9,9 +9,7 @@ compliances originally in L/mmHg and converted to cm^3/dynes/cm2
 resistances in (dynes/cm2)/(cm^3/s)
 Ts, the time constant is in seconds
 """
-Psa_u_star = 100 * 1333
 
-Psa_u = Psa_u_star
 init_dP_RA = 2 * 1333 # (dynes/cm2)
 
 Hu_patient = 32 # cm
@@ -77,4 +75,5 @@ F_min = 40 / 60
 
 # try parametrizing controller with pairs (P*, F*), (P_min, F_min)
 F_star = 50 / 60
-Psa_u_star = Psa_u_star
+Psa_u_star = 60 * 1333
+

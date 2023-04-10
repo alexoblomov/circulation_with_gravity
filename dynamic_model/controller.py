@@ -12,6 +12,9 @@ def get_linear_heart_rate(dPsa, F_max, F_min, P_max, P_min):
             arterial pressure for individual
     """
     m = (F_min - F_max) / (P_max - P_min)
+    print("m ", m)
+    # breakpoint()
+    # m = 1.5*m
     b = F_max - m*P_max
     # b = F_star - m*Psa_u_star
     F = m*dPsa + b
@@ -32,3 +35,23 @@ def get_exp_heart_rate(dPsa, Psa_star, F_star):
     F = np.exp(-dPsa) + d
 
     return F
+
+def get_lower_peripheral_resistance(dPsa, Psa_u_star, Rsl_star, 
+                                    Rsl_min, Psa_u_min):
+    """ return the target lower peripheral resistance to account for a drop or
+    increase in upper systemic blood pressure
+
+    Rsl_min = 100 dynes
+    Rsl_max = 200 dynes
+    Args:
+        dPsa (_type_): _description_
+        Psa_u_star (_type_): _description_
+        Rsl_star (_type_): _description_
+        Rsl_min (_type_): _description_
+        Psa_u_min (_type_): _description_
+    """
+    m = (Rsl_min - Rsl_star) / (Psa_u_star - Psa_u_min)
+    b = Rsl_star - m * Psa_u_star
+    Rs_l = dPsa * m + b
+
+    return Rs_l
