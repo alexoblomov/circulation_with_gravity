@@ -9,7 +9,8 @@ from pathlib import Path
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 from volume_odes import *
-from controller import get_linear_heart_rate, get_exp_heart_rate
+from controller import (get_linear_heart_rate, get_exp_heart_rate,
+    get_lower_peripheral_resistance)
 from utils.io import import_g_profile
 
 control_type = "linear" # linear or exp -- which controller we call
@@ -18,7 +19,7 @@ path = Path("dynamic_model/g_profiles")
 fname = path / "NASTAR_100percent.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
-breakpoint()
+
 end_timestep = 7498
 T = T[:end_timestep]
 g_range = g_range[:end_timestep]
@@ -139,7 +140,8 @@ for t in range(n_timesteps):
         
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
-
+        Rs_l = get_lower_peripheral_resistance(dPsa, Psa_u_star, Rs_l_star,
+                                               Rs_l_min, P_sa_u_min)
         
         # Q[t] = 500
         # h is euler iteration timestep

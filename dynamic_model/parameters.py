@@ -30,6 +30,10 @@ Gs = 1 / Rs
 Gs_u = Hu_factor * Gs
 Gs_l = Hl_factor * Gs
 Rs_l = 1 / Gs_l
+
+Rs_l_star = Rs_l
+Rs_l_min = 0.8 * Rs_l
+
 Rs_u = 1 / Gs_u
 Rp = (1.61 * 1333) / (1000 / 60)
 
