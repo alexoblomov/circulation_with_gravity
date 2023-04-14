@@ -1,7 +1,6 @@
 """
 Purpose: simulate model with varying values of G and plot output variables
 of interest
-Nb case III is only actualized when P_thorax is roughly 70x its nominal value
 """
 
 
@@ -11,7 +10,7 @@ from parameters import *
 
 G = np.linspace(g_earth,10*980, 300)
 
-P_thorax = np.linspace(- 4 * 1333,3 * 1333,8)
+P_thorax = np.linspace(- 4 * 1333, 31 * 1333,8)
 
 #P_thorax = -4*1333;
 P_RA = P_thorax + dP_RA
@@ -49,8 +48,8 @@ for j in range(len(P_thorax)):
         elif P_thorax[j] > - dP_RA and P_thorax[j] < rho * G[i] * Hu - dP_RA:
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
                       - (Tp * Gs + Csa)* Psa_u_star \
-                      - (Tp * Gs_l + Csa_l) * (rho * G[i] * Hu - Cs_l *
-                                               rho * G[i] * (- Hl)) \
+                      - (Tp * Gs_l + Csa_l) * (rho * G[i] * Hu) \
+                      - Cs_l * rho * G[i] * (- Hl) \
                       - (Csv_l - Tp * Gs_l) * (P_thorax[j] + dP_RA)
             Psv_l = - rho * G[i] * Hl + P_thorax[j] + dP_RA
             Psv_u = 0
@@ -87,9 +86,9 @@ for j in range(len(P_thorax)):
             # print("entered case III")
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA - \
                     (Tp*Gs + Csa_l+Csa_u)*Psa_u_star \
-                    +(Tp*Gs + Csa_u - Csv_l) * rho * G[i] * Hu \
-                    + (Csa_l+Csv_l) * rho * G[i] * (-Hl) \
-                    + (Csv_l+Csv_u - Tp*Gs)* (P_thorax[j] - dP_RA)
+                    - (Tp*Gs + Csa_l - Csv_u) * rho * G[i] * Hu \
+                    - (Csa_l+Csv_l) * rho * G[i] * (-Hl) \
+                    - (Csv_l+Csv_u - Tp*Gs)* (P_thorax[j] - dP_RA)
 
             Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
             Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
@@ -122,10 +121,10 @@ for j in range(len(P_thorax)):
             F_vec[i] = F
             Ppa_vec[i] = Ppa
         else:
-            Vd_total_vec[i] = nnan
-            Q_vec[i] = nnan
-            F_vec[i] = nnan
-            Ppa_vec[i] = nnan
+            Vd_total_vec[i] = 0
+            Q_vec[i] = 0
+            F_vec[i] = 0
+            Ppa_vec[i] = 0
     sol_Vd_Pthorax_G[j,:] = Vd_total_vec
     sol_Q_Pthorax_G[j,:] = Q_vec
     sol_F_Pthorax_G[j,:] = F_vec
