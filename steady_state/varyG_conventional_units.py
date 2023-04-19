@@ -1,31 +1,29 @@
 """
 Purpose: simulate model with varying values of G and plot output variables
 of interest
+Nb case III is only actualized when P_thorax is roughly 70x its nominal value
 """
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
 
-G = np.linspace(g_earth,10*980, 300)
+G = np.linspace(g_earth,3*980, 3000)
 
-P_thorax = np.linspace(- 4 * 1333, 31 * 1333,8)
+P_thorax = np.linspace(- 4 * 1333, 24 * 1333,8)
 
-#P_thorax = -4*1333;
 P_RA = P_thorax + dP_RA
 
-cases = np.zeros((len(P_thorax),len(G)), dtype=np.uint8)
+cases = np.empty((len(P_thorax),len(G)), dtype=np.uint8)
 
-Vd_total_vec = np.zeros(len(G))
-Q_vec = np.zeros(len(G))
-F_vec = np.zeros(len(G))
-Ppa_vec = np.zeros(len(G))
+Vd_total_vec = np.empty(len(G))
+Q_vec = np.empty(len(G))
+F_vec = np.empty(len(G))
+Ppa_vec = np.empty(len(G))
 
-sol_Vd_Pthorax_G = np.zeros((len(P_thorax),len(G)))
-sol_Q_Pthorax_G = np.zeros((len(P_thorax),len(G)))
-sol_F_Pthorax_G = np.zeros((len(P_thorax),len(G)))
-sol_Ppa_Pthorax_G = np.zeros((len(P_thorax),len(G)))
+sol_Vd_Pthorax_G = np.empty((len(P_thorax),len(G)))
+sol_Q_Pthorax_G = np.empty((len(P_thorax),len(G)))
+sol_F_Pthorax_G = np.empty((len(P_thorax),len(G)))
+sol_Ppa_Pthorax_G = np.empty((len(P_thorax),len(G)))
 
 Hu = Hu_patient
 Hl = Hl_patient
@@ -88,7 +86,7 @@ for j in range(len(P_thorax)):
                     (Tp*Gs + Csa_l+Csa_u)*Psa_u_star \
                     - (Tp*Gs + Csa_l - Csv_u) * rho * G[i] * Hu \
                     - (Csa_l+Csv_l) * rho * G[i] * (-Hl) \
-                    - (Csv_l+Csv_u - Tp*Gs)* (P_thorax[j] - dP_RA)
+                    - (Csv_l+Csv_u - Tp*Gs)* (P_thorax[j] + dP_RA)
 
             Psv_l = P_thorax[j] + dP_RA + rho * G[i] * (- Hl)
             Psv_u = P_thorax[j] + dP_RA - rho * G[i] * Hu
@@ -115,16 +113,16 @@ for j in range(len(P_thorax)):
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA
             Ppa = Ppv + Q * Rp
             cases[j, i] = 3
-        if Vd_total > 0:
+        if Vd_total >= 0:
             Vd_total_vec[i] = Vd_total
             Q_vec[i] = Q
             F_vec[i] = F
             Ppa_vec[i] = Ppa
         else:
-            Vd_total_vec[i] = 0
-            Q_vec[i] = 0
-            F_vec[i] = 0
-            Ppa_vec[i] = 0
+            Vd_total_vec[i] = float('nan')
+            Q_vec[i] = float('nan')
+            F_vec[i] = float('nan')
+            Ppa_vec[i] = float('nan')
     sol_Vd_Pthorax_G[j,:] = Vd_total_vec
     sol_Q_Pthorax_G[j,:] = Q_vec
     sol_F_Pthorax_G[j,:] = F_vec
@@ -136,25 +134,6 @@ sol_Q_Pthorax_G = sol_Q_Pthorax_G * 60 / 1000
 sol_F_Pthorax_G = sol_F_Pthorax_G * 60
 sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G / 1333
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
-### PLOT OPTIONS ###
-
-##plot(x, y,myLineColorPref,'color', myLineColorVec,'LineWidth', myLineWidth) #buffer times in black
-# myLineColorPref = 'k-'
-#
-# myLineColorVec = narray([0,0,0])
-#
-# myLineWidth = 1
-# myLabelFontSize = 18
-# alpha = 0.1
-#
-# beta = 1
-
-#family of plots for Reserve Volume vs. G for different Pthorax values:
-
-# plt.show()
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-
 
 plt.figure(figsize=(15, 12))
 plt.subplots_adjust(hspace=0.5)
@@ -188,47 +167,26 @@ for n, plt_title in enumerate(pthorax_titles):
     idx_case_2 = cases == 2
     idx_case_3 = cases == 3
     plt.plot(G, sol_Vd_Pthorax_G[n, :])
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_2],'g')
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_3],'b')
-    # chart formatting
-    plt.title(plt_title)
+    plt.title('Reserve Volume v. Acceleration')
     # ax.get_legend().remove()
     plt.xlabel("g multiple")
     plt.ylabel("VT0")
-plt.savefig("onegraph_VT0_vs_g_V0_w_height_factor.png")
-#################### code needs to be adapted from here on #####################
-# h1 = plt.figure(101)
-# clf(101)
-# for i in narange(1,len(P_thorax)+1).reshape(-1):
-#     plt.plot(G,sol_Q_Pthorax_G(i,:))
-#     plt.xlabel('G','interpreter','latex')
-#     plt.ylabel('Cardiac OuTput (L/min)','interpreter','latex')
-#     hold('on')
+plt.xlim(1,2.5)
+plt.ylim(0.0, 1.75)
+plt.legend(pthorax_titles)
+plt.savefig("onegraph_VT0_vs_g_V0")
 
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-
-# h2 = plt.figure(102)
-# clf(102)
-# hold('on')
-# for i in narange(1,len(P_thorax)+1).reshape(-1):
-#     myLineColor = myLineColorVec + alpha * (i - 1)
-#     plt.plot(G,sol_F_Pthorax_G(i,:),myLineColorPref,'color',myLineColor,'LineWidth',myLineWidthPlot)
-#
-# hold('off')
-# plt.xlabel('G')
-# plt.ylabel('Heart Rate (per minute)')
-# hold('on')
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-#
-# h3 = plt.figure(103)
-# clf(103)
-# for i in narange(1,len(P_thorax)+1).reshape(-1):
-#     plt.plot(G,sol_Ppa_Pthorax_G(i,:))
-#     plt.xlabel('G','interpreter','latex')
-#     plt.ylabel('Pulmonary Arterial Pressure (mmHg)','interpreter','latex')
-#     hold('on')
-
-# xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-# xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
+plt.figure()
+for n, plt_title in enumerate(pthorax_titles):
+    # add a new subplot iteratively
+    # filter df and plot ticker on the new subplot axis
+    idx_case_1 = cases == 1
+    idx_case_2 = cases == 2
+    idx_case_3 = cases == 3
+    plt.plot(G, sol_F_Pthorax_G[n, :])
+    plt.title('Heart Rate v. Acceleration')
+    # ax.get_legend().remove()
+    plt.xlabel("g multiple")
+    plt.ylabel("F")
+plt.legend(pthorax_titles)
+plt.savefig("onegraph_F_vs_g_V0")
