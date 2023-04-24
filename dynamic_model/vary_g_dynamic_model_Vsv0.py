@@ -5,25 +5,42 @@ Purpose : simulate ode model
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from pathlib import Path
 from scipy.integrate import odeint, solve_ivp
 from parameters import *
 from volume_odes import *
 from controller import (get_linear_heart_rate, get_exp_heart_rate,
-                        get_lower_peripheral_resistance)
+    get_lower_peripheral_resistance, get_reserve_venous_volume)
+from utils.io import import_g_profile
 
 control_type = "linear" # linear or exp -- which controller we call
 
+path = Path("dynamic_model/g_profiles")
+fname = path / "NASTAR_100percent.csv"
+# INPUTS 
+T, g_range = import_g_profile(fname)
 
-# time steps
-# forward euler time step
-n_timesteps = 1000
-n_seconds = 10
-T = np.linspace(0.01, n_seconds, num=n_timesteps)
+end_timestep = 7498
+T = T[:end_timestep]
+g_range = g_range[:end_timestep]
+
+# end_timestep = 1000
+# nth_item = 30
+# T = T[:end_timestep]
+# T = T[0::nth_item]
+
+# g_range = g_range[:end_timestep]
+# g_range = g_range[0::nth_item]
+
+g_range = g_earth * g_range
+n_timesteps = len(T)
+n_seconds = int(T[-1])
 h = n_seconds/n_timesteps
 
+# breakpoint()
+print("n_timesteps, ", n_timesteps, " n_seconds, ", n_seconds, "h, ", h)
 
-# INPUTS 
-g_range = g_earth*np.ones(n_timesteps)
+
 Pext_l = Pext * np.ones(n_timesteps)
 P_thorax = (- 4 * 1333) * np.ones(n_timesteps)
 
@@ -115,17 +132,18 @@ for t in range(n_timesteps):
 
         dPsa = (Psa_u[t] - Psa_u_star)
         if control_type == "linear":
-            F[t] = get_linear_heart_rate(dPsa, F_star, F_min, Psa_u_star, P_sa_u_min)
-            # fit curve through max points and starred points doesn't work. maybe simple point slope rewrite
-            # F[t] = get_linear_heart_rate(dPsa, F_star, F_max, Psa_u_star, P_sa_u_max) # not work
+            F[t] = get_linear_heart_rate(dPsa, F_star, F_min, Psa_u_star,
+                                         P_sa_u_min)
+            # fit curve through max points and starred points doesn't work.
+            # maybe simple point slope rewrite
+            # F[t] = get_linear_heart_rate(dPsa, F_star, F_max, Psa_u_star,
+            # P_sa_u_max) # not work
         elif control_type == "exp":
             F[t] = get_exp_heart_rate(dPsa, Psa_u_star, F_star)
         
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
-
-        # Rs_l = get_lower_peripheral_resistance(dPsa, Psa_u_star, Rs_l_star,
-        #                                        Rs_l_min, P_sa_u_min)
+        
         # Q[t] = 500
         # h is euler iteration timestep
         Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
@@ -152,6 +170,9 @@ for t in range(n_timesteps):
 
 Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
+# g_range = g_range/100
+g_range = g_range / g_earth
+
 fig = plt.figure(constrained_layout=False)
 
 gs = gridspec.GridSpec(3, 3, figure=fig)
@@ -164,7 +185,7 @@ ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 ax7 = fig.add_subplot(gs[2, 0])
 ax8 = fig.add_subplot(gs[2, 1])
-ax9 = fig.add_subplot(gs[2, 2])
+
 
 start = 0
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
@@ -183,8 +204,6 @@ ax4.plot(T[start:], Psa_l[start:]*dynes_2_mmhg, label ='Psa_l')
 # ax4.set_title("Psa_l")
 ax4.legend()
 ax5.plot(T[start:], P_ra[start:]*dynes_2_mmhg, label='Pra')
-ax5.plot(T, rho*g_range*Hu_patient*dynes_2_mmhg, label='rho g Hu')
-
 # ax5.set_title("Pra")
 ax5.legend()
 
@@ -200,18 +219,14 @@ ax8.plot(T, g_range, label='g')
 ax8.set_ylabel("x G")
 ax8.legend()
 
-ax9.plot(T, rho*g_range*Hu_patient*dynes_2_mmhg, label='rho g Hu')
-ax9.set_ylabel("mmHg")
-ax9.legend()
-
 fig.tight_layout()
 
-title = control_type + '_control_dynamic_model.png'
+title = 'varyG_' +  control_type + '_control_dynamic_model.png'
 plt.savefig(title)
 
-p_range = np.linspace(0, P_sa_u_max)
-# f_range = np.array([get_exp_heart_rate(p, F_star, F_min, Psa_u_star, 
-#                                    P_sa_u_min) for p in p_range])
+# p_range = np.linspace(0, P_sa_u_max)
+# # f_range = np.array([get_exp_heart_rate(p, F_star, F_min, Psa_u_star, 
+# #                                    P_sa_u_min) for p in p_range])
 # f_range = np.array([get_linear_heart_rate(p, F_star, F_min, Psa_u_star, 
 #                                    P_sa_u_min) for p in p_range])
 # plt.figure()
