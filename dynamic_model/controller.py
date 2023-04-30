@@ -1,22 +1,19 @@
 import numpy as np
 
-def get_linear_heart_rate(dPsa, F_max, F_min, P_max, P_min):
+def get_linear_heart_rate(dPsa, F_star, F_min, P_max, P_min):
     """return a linear function of heart rate F in terms of pressure
 
     Args:
-        F_max (_type_): maximum viable pressure for individual
+        F_star (_type_): maximum viable pressure for individual
         F_min (_type_): minimum viable pressure 
         P_max (_type_): maximum viable upper (coronary) 
             arterial pressure for individual
         P_min (_type_): minimum viable upper (coronary) 
             arterial pressure for individual
+        assumes F* > F min
     """
-    m = (F_min - F_max) / (P_max - P_min)
-    print("m ", m)
-    # breakpoint()
-    # m = 1.5*m
-    b = F_max - m*P_max
-    # b = F_star - m*Psa_u_star
+    m = (F_min - F_star) / (P_max - P_min)
+    b = F_star - m*P_max
     F = m*dPsa + b
     
     return F
@@ -55,3 +52,22 @@ def get_lower_peripheral_resistance(dPsa, Psa_u_star, Rsl_star,
     Rs_l = dPsa * m + b
 
     return Rs_l
+
+def get_reserve_venous_volume(dPsa, Psa_u_star, Vsv0_star):
+    """_summary_
+
+    Args:
+        dPsa_u (_type_): _description_
+        dP_RA (_type_): determines distension of RA and Stroke Volume
+
+    Returns
+        Vsv0 : lower systemic reserve volume
+    """
+    m = 3
+    b = Vsv0_star - m*Psa_u_star
+    Vsv0 = dPsa*m + b
+
+    print("Vsv0 ", Vsv0, " dPsa ", dPsa, " Psa_u_star ", Psa_u_star,
+          "Vsv0_star ", Vsv0_star)
+    return Vsv0
+

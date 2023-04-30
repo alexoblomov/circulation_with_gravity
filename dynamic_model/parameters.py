@@ -19,7 +19,7 @@ lumped_height = Hu_patient + Hl_patient
 Hu_factor = Hu_patient /lumped_height
 Hl_factor = Hl_patient/lumped_height
 
-rho = 1
+rho = 1 # 1 gram/cm3 (cf definition of dyne)
 Pext = 0 #760 *1333 # 1 atmosphere = 760 mmhg  * 1333 -> dynes/cm2
 
 g_earth = 980 # cm/s2
@@ -80,4 +80,4 @@ F_min = 40 / 60
 # try parametrizing controller with pairs (P*, F*), (P_min, F_min)
 F_star = 50 / 60
 Psa_u_star = 60 * 1333
-
+Vsv0_star = 750 #ml
