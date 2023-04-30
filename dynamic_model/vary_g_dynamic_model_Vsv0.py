@@ -55,19 +55,16 @@ H = Hu + Hl
 # vary gravity and/or other parameters
 
 # OUTPUTS
-Q = np.zeros(n_timesteps)
-P_ra = np.zeros(n_timesteps)
-Psv_u = np.zeros(n_timesteps)
-Psv_l = np.zeros(n_timesteps)
-Psa_u = np.zeros(n_timesteps)
-Psa_l = np.zeros(n_timesteps)
-F = np.zeros(n_timesteps) # set by controller inside loop
+Q = np.zeros(n_timesteps) #; Q[0] = 3000
+P_ra = np.zeros(n_timesteps) #; P_ra[0] = 2*1333
+Psv_u = np.zeros(n_timesteps) # Psv_u[0] = 15 * 1333
+Psv_l = np.zeros(n_timesteps) #; Psv_l[0] = 59 * 1333
+Psa_u = np.zeros(n_timesteps) #; Psa_u[0] = 140 * 1333
+Psa_l = np.zeros(n_timesteps) #; Psa_l[0] = 104 * 1333
 
 # TODO consider moving to parameters.py
 dP_RA = np.zeros(n_timesteps)
 dP_RA[0] = init_dP_RA
-
-
 
 
 # assume venous vol is roughly 70% of total BV.
@@ -83,12 +80,15 @@ Vsv[0] = init_Vsv
 
 # reseve volumes
 Vsa0 = np.ones(n_timesteps) * (1-pct_venous )* VT0_steady_state_cntrl
+# compare with:
 Vsv0 = np.ones(n_timesteps) * pct_venous * VT0_steady_state_cntrl
 
+F = get_linear_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
+        P_sa_u_min) * np.ones(n_timesteps)
 
 for t in range(n_timesteps):
     g = g_range[t]
-
+    
     # Case I:
     dP_RA[t] = P_ra[t] - P_thorax[t]
     if P_thorax[t]<= - dP_RA[t]:
@@ -131,15 +131,9 @@ for t in range(n_timesteps):
         
 
         dPsa = (Psa_u[t] - Psa_u_star)
-        if control_type == "linear":
-            F[t] = get_linear_heart_rate(dPsa, F_star, F_min, Psa_u_star,
-                                         P_sa_u_min)
-            # fit curve through max points and starred points doesn't work.
-            # maybe simple point slope rewrite
-            # F[t] = get_linear_heart_rate(dPsa, F_star, F_max, Psa_u_star,
-            # P_sa_u_max) # not work
-        elif control_type == "exp":
-            F[t] = get_exp_heart_rate(dPsa, Psa_u_star, F_star)
+
+        if t > 0:
+            Vsv0[t] = get_reserve_venous_volume(dPsa, Psa_u_star, Vsv0_star)
         
         print("F ", F[t])
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
@@ -185,6 +179,7 @@ ax5 = fig.add_subplot(gs[1, 2])
 ax6 = fig.add_subplot(gs[0, 2])
 ax7 = fig.add_subplot(gs[2, 0])
 ax8 = fig.add_subplot(gs[2, 1])
+ax9 = fig.add_subplot(gs[2, 2])
 
 
 start = 0
@@ -219,9 +214,13 @@ ax8.plot(T, g_range, label='g')
 ax8.set_ylabel("x G")
 ax8.legend()
 
+ax9.plot(T, Vsv0, label='Vsv0')
+ax9.set_ylabel("ml")
+ax9.legend()
+
 fig.tight_layout()
 
-title = 'varyG_' +  control_type + '_control_dynamic_model.png'
+title = 'varyG_Vsv0' +  control_type + '_control_dynamic_model.png'
 plt.savefig(title)
 
 # p_range = np.linspace(0, P_sa_u_max)
