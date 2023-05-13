@@ -14,13 +14,13 @@ from utils.io import import_g_profile
 
 
 path = Path("dynamic_model/g_profiles")
-fname = path / "NASTAR_100percent.csv"
+fname = path / "Run_1_G.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
 
-end_timestep = 7498
-T = T[:end_timestep]
-g_range = g_range[:end_timestep]
+# end_timestep = 7498
+# T = T[:end_timestep]
+# g_range = g_range[:end_timestep]
 
 g_range = g_earth * g_range
 
