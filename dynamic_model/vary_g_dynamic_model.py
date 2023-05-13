@@ -139,7 +139,7 @@ for t in range(n_timesteps):
         elif control_type == "exp":
             F[t] = get_exp_heart_rate(dPsa, Psa_u_star, F_star)
         
-        print("F ", F[t])
+
         Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
         
         # Q[t] = 500
@@ -155,7 +155,7 @@ for t in range(n_timesteps):
                                           Q[t])
         
 
-        print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
+        # print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
     # # Case II
     # elif P_thorax[t]> - dP_RA[t] and P_thorax[t]< rho * g * Hu - dP_RA[t]:z
 
@@ -168,7 +168,6 @@ for t in range(n_timesteps):
 
 Q = 60/1000 * Q # convert cm3/s to L/min
 dynes_2_mmhg = 1/1333
-# g_range = g_range/100
 g_range = g_range / g_earth
 
 fig = plt.figure(constrained_layout=False)
@@ -185,7 +184,7 @@ ax7 = fig.add_subplot(gs[2, 0])
 ax8 = fig.add_subplot(gs[2, 1])
 
 
-start = 0
+start = 150
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
@@ -209,11 +208,11 @@ ax6.plot(T[start:], Q[start:], label='Q')
 ax6.set_ylabel("L/min")
 ax6.legend()
 
-ax7.plot(T, F*60, label='F')
+ax7.plot(T[start:], F[start:]*60, label='F')
 ax7.set_ylabel("B/min")
 ax7.legend()
 
-ax8.plot(T, g_range, label='g')
+ax8.plot(T[start:], g_range[start:], label='g')
 ax8.set_ylabel("x G")
 ax8.legend()
 

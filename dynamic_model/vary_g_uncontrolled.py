@@ -18,9 +18,9 @@ fname = path / "Run_1_G.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
 
-# end_timestep = 7498
-# T = T[:end_timestep]
-# g_range = g_range[:end_timestep]
+end_timestep = 7498
+T = T[:end_timestep]
+g_range = g_range[:end_timestep]
 
 g_range = g_earth * g_range
 
@@ -169,7 +169,7 @@ ax6 = fig.add_subplot(gs[0, 2])
 ax7 = fig.add_subplot(gs[2, 0])
 ax8 = fig.add_subplot(gs[2, 1])
 
-start = 0
+start = 150
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 ax1.legend()
