@@ -16,7 +16,7 @@ from utils.io import import_g_profile
 control_type = "linear" # linear or exp -- which controller we call
 
 path = Path("dynamic_model/g_profiles")
-fname = path / "NASTAR_100percent.csv"
+fname = path / "Run_1_G.csv"
 # INPUTS 
 T, g_range = import_g_profile(fname)
 
