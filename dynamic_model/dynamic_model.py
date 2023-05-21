@@ -198,12 +198,12 @@ ax7.set_ylabel("B/min")
 ax7.legend()
 
 ax8.plot(T, g_range, label='g')
-ax8.set_ylabel("x G")
-ax8.legend()
+ax8.set_ylabel("Gz")
+#ax8.legend()
 
 ax9.plot(T, rho*g_range*Hu_patient*dynes_2_mmhg, label='rho g Hu')
 ax9.set_ylabel("mmHg")
-ax9.legend()
+#ax9.legend()
 
 fig.tight_layout()
 
