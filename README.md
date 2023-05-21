@@ -30,6 +30,11 @@ python varyG_conventional_units.py
 to run the dynamic model (work in progress)
 ```
 git checkout ode-model
-cd dynamic_model
 python dynamic_model.py
+
 ```
+to run the dynamic model with g profile
+```
+python dynamic_model/dynamic_model.py
+```
+
