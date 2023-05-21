@@ -16,6 +16,11 @@ def get_linear_heart_rate(dPsa, F_star, F_min, P_max, P_min):
     m = (F_min - F_star) / (P_max - P_min)
     b = F_star - m*P_max
     F = m*dPsa + b
+    if F > 200: 
+        F = 200 
+    if F < 0: 
+        F = 0 
+       
     
     return F
 
