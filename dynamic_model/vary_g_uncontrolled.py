@@ -168,33 +168,37 @@ ax8 = fig.add_subplot(gs[2, 1])
 
 start = 150
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
-ax1.set_ylabel("ml")
-ax1.legend()
+ax1.set_ylabel("Vsa ml")
+# ax1.legend()
 ax2.plot(T[start:], Vsv[start:-1], label='Vsv')
-ax2.legend()
+ax1.set_ylabel("Vsv ml")
+#ax2.legend()
 
 ax3.plot(T[start:], Psa_u[start:]*dynes_2_mmhg, label='Psa_u')
 
-ax3.set_ylabel("mmHg")
-ax3.legend()
-ax4.plot(T[start:], Psa_l[start:]*dynes_2_mmhg, label ='Psa_l')
+ax3.set_ylabel("Psa_l mmHg")
+#ax3.legend()
 
-ax4.legend()
+ax4.plot(T[start:], Psa_l[start:]*dynes_2_mmhg, label ='Psa_l')
+#ax4.legend()
+ax4.set_ylabel("Psa_l mmHg")
+
 ax5.plot(T[start:], P_ra[start:]*dynes_2_mmhg, label='Pra')
-ax5.legend()
+#ax5.legend()
+ax5.set_ylabel("Pra mmHg")
 
 ax6.plot(T[start:], Q[start:], label='Q')
 ax6.set_ylabel("L/min")
-ax6.legend()
+#ax6.legend()
 
 ax7.plot(T, F*60, label='F')
-ax7.set_ylabel("B/min")
-ax7.legend()
+ax7.set_ylabel("beats/min")
+#ax7.legend()
 
 
 ax8.plot(T, g_range, label='g')
-ax8.set_ylabel("x G")
-ax8.legend()
+ax8.set_ylabel("Gz")
+#ax8.legend()
 
 
 fig.tight_layout()
