@@ -21,6 +21,7 @@ fname = path / "Run_1_G.csv"
 T, g_range = import_g_profile(fname)
 
 end_timestep = 7498
+# end_timestep = 1000
 T = T[:end_timestep]
 g_range = g_range[:end_timestep]
 
@@ -89,69 +90,66 @@ F = get_linear_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
 for t in range(n_timesteps):
     g = g_range[t]
     
-    # Case I:
-    dP_RA[t] = P_ra[t] - P_thorax[t]
-    if P_thorax[t]<= - dP_RA[t]:
-        # eq 20 => six cases for Pra:
-        # eq 20 gives Pra
-        if Pext_l[t] < rho * g * Hu:
-            if P_ra[t] <= Pext_l[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] -
-                           Csv_l*(rho*g*Hl) +
-                           Cra * P_thorax[t]) / Cra
-            elif P_ra[t] >= Pext_l[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l *
-                           (rho * g * Hl - Pext_l[t]) + Cra * P_thorax[t]
-                           ) / (Cra + Csv_l)
-            elif rho * g * Hu <= P_ra:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
-                           + Csv_u * rho * g * Hu + Cra *
-                           P_thorax[t]) / (Cra + Csv_u + Csv_l)
-        else:
-            if P_ra[t] <= rho * g * Hu:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
-                                                       - Pext_l[t])
-                           + Cra * P_thorax[t]- Csv_l*Pext_l[t]) / Cra
-            elif P_ra[t] >= rho * g * Hu:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g * Hl +
-                           Csv_u * rho * g * Hu + Cra * P_thorax[t]
-                           ) / (Cra + Csv_u)
-            elif Pext_l[t] <= P_ra[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl -
-                           Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax[t]
-                           ) / (Cra + Csv_u + Csv_l)
+    # eq 20 => six cases for Pra:
+    # eq 20 gives Pra
+    if Pext_l[t] < rho * g * Hu:
+        if P_ra[t] <= Pext_l[t]:
+            P_ra[t] = (Vsv[t] - Vsv0[t] -
+                        Csv_l*(rho*g*Hl) +
+                        Cra * P_thorax[t]) / Cra
+        elif P_ra[t] >= Pext_l[t]:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l *
+                        (rho * g * Hl - Pext_l[t]) + Cra * P_thorax[t]
+                        ) / (Cra + Csv_l)
+        elif rho * g * Hu <= P_ra:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
+                        + Csv_u * rho * g * Hu + Cra *
+                        P_thorax[t]) / (Cra + Csv_u + Csv_l)
+    else:
+        if P_ra[t] <= rho * g * Hu:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
+                                                    - Pext_l[t])
+                        + Cra * P_thorax[t]- Csv_l*Pext_l[t]) / Cra
+        elif P_ra[t] >= rho * g * Hu:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g * Hl +
+                        Csv_u * rho * g * Hu + Cra * P_thorax[t]
+                        ) / (Cra + Csv_u)
+        elif Pext_l[t] <= P_ra[t]:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl -
+                        Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax[t]
+                        ) / (Cra + Csv_u + Csv_l)
 
-        Psv_u[t] = max(0, P_ra[t] - rho * g * Hu)  # eq 15
-        Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g*Hl  # eq 18
+    Psv_u[t] = max(0, P_ra[t] - rho * g * Hu)  # eq 15
+    Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g*Hl  # eq 18
 
-        Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g*H)/(
-                    Csa)  # eq 12
-        Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
-                    Csa)  # eq 13
-        
+    Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g*H)/(
+                Csa)  # eq 12
+    Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
+                Csa)  # eq 13
+    
 
-        dPsa = (Psa_u[t] - Psa_u_star)
+    dPsa = (Psa_u[t] - Psa_u_star)
 
-        if t > 0:
-            Vsv0[t] = get_reserve_venous_volume(dPsa, Psa_u_star, Vsv0_star)
-        
-        print("F ", F[t])
-        Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
-        
-        # Q[t] = 500
-        # h is euler iteration timestep
-        Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
-                                          Rs_l, Csa_u, Pext_l[t], Psa_u[t],
-                                          Psv_u[t], Psv_l[t], rho, g, H,
-                                          Q[t])
+    if t > 0:
+        Vsv0[t] = get_reserve_venous_volume(dPsa, Psa_u_star, Vsv0_star)
+    
+    print("F ", F[t])
+    Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
+    
+    # Q[t] = 500
+    # h is euler iteration timestep
+    Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
+                                        Rs_l, Csa_u, Pext_l[t], Psa_u[t],
+                                        Psv_u[t], Psv_l[t], rho, g, H,
+                                        Q[t])
 
-        Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa[t], Vsa0[t], Csa, Csa_l, Rs_u,
-                                          Rs_l, Csa_u, Pext_l[t], Psa_u[t],
-                                          Psv_u[t], Psv_l[t], rho, g, H,
-                                          Q[t])
-        
+    Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa[t], Vsa0[t], Csa, Csa_l, Rs_u,
+                                        Rs_l, Csa_u, Pext_l[t], Psa_u[t],
+                                        Psv_u[t], Psv_l[t], rho, g, H,
+                                        Q[t])
+    
 
-        print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
+    print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
     # # Case II
     # elif P_thorax[t]> - dP_RA[t] and P_thorax[t]< rho * g * Hu - dP_RA[t]:z
 
@@ -182,7 +180,7 @@ ax8 = fig.add_subplot(gs[2, 1])
 ax9 = fig.add_subplot(gs[2, 2])
 
 
-start = 0
+start = 150
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
@@ -210,11 +208,11 @@ ax7.plot(T, F*60, label='F')
 ax7.set_ylabel("B/min")
 ax7.legend()
 
-ax8.plot(T, g_range, label='g')
+ax8.plot(T[start:], g_range[start:], label='g')
 ax8.set_ylabel("x G")
 ax8.legend()
 
-ax9.plot(T, Vsv0, label='Vsv0')
+ax9.plot(T[start:], Vsv0[start:], label='Vsv0')
 ax9.set_ylabel("ml")
 ax9.legend()
 
