@@ -87,61 +87,58 @@ Vsv0 = np.ones(n_timesteps) * pct_venous * VT0_steady_state_cntrl
 for t in range(n_timesteps):
     g = g_range[t]
 
-    # Case I:
-    dP_RA[t] = P_ra[t] - P_thorax[t]
-    if P_thorax[t]<= - dP_RA[t]:
-        # eq 20 => six cases for Pra:
-        # eq 20 gives Pra
-        if Pext_l[t] < rho * g * Hu:
-            if P_ra[t] <= Pext_l[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] -
-                           Csv_l*(rho*g*Hl) +
-                           Cra * P_thorax[t]) / Cra
-            elif P_ra[t] >= Pext_l[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l *
-                           (rho * g * Hl - Pext_l[t]) + Cra * P_thorax[t]
-                           ) / (Cra + Csv_l)
-            elif rho * g * Hu <= P_ra:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
-                           + Csv_u * rho * g * Hu + Cra *
-                           P_thorax[t]) / (Cra + Csv_u + Csv_l)
-        else:
-            if P_ra[t] <= rho * g * Hu:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
-                                                       - Pext_l[t])
-                           + Cra * P_thorax[t]- Csv_l*Pext_l[t]) / Cra
-            elif P_ra[t] >= rho * g * Hu:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g * Hl +
-                           Csv_u * rho * g * Hu + Cra * P_thorax[t]
-                           ) / (Cra + Csv_u)
-            elif Pext_l[t] <= P_ra[t]:
-                P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl -
-                           Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax[t]
-                           ) / (Cra + Csv_u + Csv_l)
+    # eq 20 => six cases for Pra:
+    # eq 20 gives Pra
+    if Pext_l[t] < rho * g * Hu:
+        if P_ra[t] <= Pext_l[t]:
+            P_ra[t] = (Vsv[t] - Vsv0[t] -
+                        Csv_l*(rho*g*Hl) +
+                        Cra * P_thorax[t]) / Cra
+        elif P_ra[t] >= Pext_l[t]:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l *
+                        (rho * g * Hl - Pext_l[t]) + Cra * P_thorax[t]
+                        ) / (Cra + Csv_l)
+        elif rho * g * Hu <= P_ra:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl - Pext_l[t])
+                        + Csv_u * rho * g * Hu + Cra *
+                        P_thorax[t]) / (Cra + Csv_u + Csv_l)
+    else:
+        if P_ra[t] <= rho * g * Hu:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl
+                                                    - Pext_l[t])
+                        + Cra * P_thorax[t]- Csv_l*Pext_l[t]) / Cra
+        elif P_ra[t] >= rho * g * Hu:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * rho * g * Hl +
+                        Csv_u * rho * g * Hu + Cra * P_thorax[t]
+                        ) / (Cra + Csv_u)
+        elif Pext_l[t] <= P_ra[t]:
+            P_ra[t] = (Vsv[t] - Vsv0[t] - Csv_l * (rho * g * Hl -
+                        Pext_l[t]) + Csv_u * rho * g * Hu + Cra * P_thorax[t]
+                        ) / (Cra + Csv_u + Csv_l)
 
-        Psv_u[t] = max(0, P_ra[t] - rho * g * Hu)  # eq 15
-        Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g*Hl  # eq 18
+    Psv_u[t] = max(0, P_ra[t] - rho * g * Hu)  # eq 15
+    Psv_l[t] = max(P_ra[t], Pext_l[t]) + rho*g*Hl  # eq 18
 
-        Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g*H)/(
-                    Csa)  # eq 12
-        Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
-                    Csa)  # eq 13
-        
-        Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
-        # Q[t] = 500
-        # h is euler iteration timestep
-        Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
-                                          Rs_l, Csa_u, Pext_l[t], Psa_u[t],
-                                          Psv_u[t], Psv_l[t], rho, g, H,
-                                          Q[t])
+    Psa_u[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_l * rho * g*H)/(
+                Csa)  # eq 12
+    Psa_l[t] = (Vsa[t] - Vsa0[t] + Csa_l*Pext_l[t] - Csa_u * rho * g*H)/(
+                Csa)  # eq 13
+    
+    Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
+    # Q[t] = 500
+    # h is euler iteration timestep
+    Vsa[t+1] = Vsa[t] + h * solve_Vsa(Vsa[t], Vsa0[t],Csa, Csa_l, Rs_u,
+                                        Rs_l, Csa_u, Pext_l[t], Psa_u[t],
+                                        Psv_u[t], Psv_l[t], rho, g, H,
+                                        Q[t])
 
-        Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa[t], Vsa0[t], Csa, Csa_l, Rs_u,
-                                          Rs_l, Csa_u, Pext_l[t], Psa_u[t],
-                                          Psv_u[t], Psv_l[t], rho, g, H,
-                                          Q[t])
-        
+    Vsv[t+1] = Vsv[t] + h * solve_Vsv(Vsa[t], Vsa0[t], Csa, Csa_l, Rs_u,
+                                        Rs_l, Csa_u, Pext_l[t], Psa_u[t],
+                                        Psv_u[t], Psv_l[t], rho, g, H,
+                                        Q[t])
+    
 
-        print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
+    print("vsa+vsv ", Vsa[t+1]+Vsv[t+1])
     # # Case II
     # elif P_thorax[t]> - dP_RA[t] and P_thorax[t]< rho * g * Hu - dP_RA[t]:z
 

@@ -12,6 +12,7 @@ def get_linear_heart_rate(dPsa, F_star, F_min, P_max, P_min):
             arterial pressure for individual
         assumes F* > F min
     """
+    
     m = (F_min - F_star) / (P_max - P_min)
     b = F_star - m*P_max
     F = m*dPsa + b
@@ -63,7 +64,7 @@ def get_reserve_venous_volume(dPsa, Psa_u_star, Vsv0_star):
     Returns
         Vsv0 : lower systemic reserve volume
     """
-    m = 3
+    m = 1000
     b = Vsv0_star - m*Psa_u_star
     Vsv0 = dPsa*m + b
 
