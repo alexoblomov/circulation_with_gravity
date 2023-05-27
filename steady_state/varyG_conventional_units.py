@@ -1,7 +1,6 @@
 """
 Purpose: simulate model with varying values of G and plot output variables
 of interest
-Nb case III is only actualized when P_thorax is roughly 70x its nominal value
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,22 +62,11 @@ for j in range(len(P_thorax)):
             F_also = (Gs * Psa_u_star +
                       (1/Rs_l)* (rho*G[i]*Hu-P_thorax[j] - dP_RA)) / (
                       C_RVD*dP_RA)
-            # breakpoint()
-            # assert F == F_also, "F, equation 64 inconsistent"
-            # (Pdb) F
-            # 1.7248725549967021
-            # (Pdb) F_also
-            # 1.7494574795209836
 
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA # eq 66
             Ppa = Ppv + Q * Rp
             Ppa_also = (C_RVD / C_LVD) * dP_RA + Rp*(Gs*Psa_u_star + 1/Rs_l *
                         (rho * G[i] *Hu - P_thorax[j] - dP_RA))
-            # (Pdb) Ppa
-            # 30219.708890709935
-            # (Pdb) Ppa_also
-            # 29308.135553880078
-            # assert Ppa == Ppa_also, "Ppa eq 67 inconsistent"
             cases[j, i] = 2
         elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
             # print("entered case III")
@@ -93,21 +81,8 @@ for j in range(len(P_thorax)):
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
             Qs_u = (Psa_u_star - Psv_u) / Rs_u
             Qs_u_also = (Psa_u_star + rho*G[i]*Hu - P_thorax[j] - dP_RA)/Rs_u
-            # assert  Qs_u == Qs_u_also, "QsU eq 81 inconsistent"
-            # (Pdb) Qs_u
-            # 40.523557770364924
-            # (Pdb) Qs_u_also
-            # 40.523557770364924
-
-            # breakpoint()
             Qs_l = (Psa_l - Psv_l) / Rs_l
             Qs_l_also = (Psa_u_star + rho*G[i]*Hu - P_thorax[j] - dP_RA)/Rs_l
-            # Qs_l == Qs_l_also, "QsL eq 82 inconsistent"
-            # (Pdb) Qs_l
-            # 53.18716957360396
-            # (Pdb) Qs_l_also
-            # 53.18716957360396
-
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
             Ppv = P_thorax[j] + (C_RVD / C_LVD) * dP_RA
@@ -135,58 +110,55 @@ sol_F_Pthorax_G = sol_F_Pthorax_G * 60
 sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G / 1333
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
 
-plt.figure(figsize=(15, 12))
-plt.subplots_adjust(hspace=0.5)
-plt.suptitle("Reserve volume vs g", fontsize=18, y=0.95)
-pthorax_titles = ["P thorax " + str(pth / 1333) + " mmHg" for pth in P_thorax]
-# loop through the length of tickers and keep track of index
-for n, plt_title in enumerate(pthorax_titles):
-    # add a new subplot iteratively
-    ax = plt.subplot(4, 2, n + 1)
+# Plotting G against Vd for different P_thorax values
+fig, ax = plt.subplots()
 
-    # filter df and plot ticker on the new subplot axis
-    idx_case_1 = cases == 1
-    idx_case_2 = cases == 2
-    idx_case_3 = cases == 3
-    ax.plot(G,sol_Vd_Pthorax_G[n,:])
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_2],'g')
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_3],'b')
-    # chart formatting
-    ax.set_title(plt_title)
-    # ax.get_legend().remove()
-    ax.set_xlabel("g multiple")
-    ax.set_ylabel("VT0")
-# plt.show()
-plt.savefig("fixed_VT0_vs_g_V0_w_height_factor.png")
+for i in range(len(P_thorax)):
+    ax.plot(G, sol_Vd_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
 
-plt.figure()
-for n, plt_title in enumerate(pthorax_titles):
-    # add a new subplot iteratively
-    # filter df and plot ticker on the new subplot axis
-    idx_case_1 = cases == 1
-    idx_case_2 = cases == 2
-    idx_case_3 = cases == 3
-    plt.plot(G, sol_Vd_Pthorax_G[n, :])
-    plt.title('Reserve Volume v. Acceleration')
-    # ax.get_legend().remove()
-    plt.xlabel("g multiple")
-    plt.ylabel("VT0")
-plt.xlim(1,2.5)
-plt.ylim(0.0, 1.75)
-plt.legend(pthorax_titles)
-plt.savefig("onegraph_VT0_vs_g_V0")
+ax.set_xlabel('Gz')
+ax.set_ylabel('Vd (L)')
+ax.set_title('Reserve Volume vs Acceleration for varying P_thorax')
+ax.legend()
+ax.set_xlim(1, 2.3)
+plt.grid(True)
+plt.show()
 
-plt.figure()
-for n, plt_title in enumerate(pthorax_titles):
-    # add a new subplot iteratively
-    # filter df and plot ticker on the new subplot axis
-    idx_case_1 = cases == 1
-    idx_case_2 = cases == 2
-    idx_case_3 = cases == 3
-    plt.plot(G, sol_F_Pthorax_G[n, :])
-    plt.title('Heart Rate v. Acceleration')
-    # ax.get_legend().remove()
-    plt.xlabel("g multiple")
-    plt.ylabel("F")
-plt.legend(pthorax_titles)
-plt.savefig("onegraph_F_vs_g_V0")
+# Plotting G against Vd for different P_thorax values
+fig, ax = plt.subplots()
+
+for i in range(len(P_thorax)):
+    ax.plot(G, sol_F_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
+
+ax.set_xlabel('Gz')
+ax.set_ylabel('F (beats/min)')
+ax.set_title('Heart Rate vs Acceleration for Varying P_thorax')
+ax.legend()
+ax.set_xlim(1, 2.3)
+plt.grid(True)
+plt.show()
+
+# Finding G intercept where Vd = 0 for different P_thorax values
+G_intercept = []
+for i in range(len(P_thorax)):
+    Vd = sol_Vd_Pthorax_G[i, :]
+    G = np.linspace(g_earth, 3 * 980, 3000)
+    zero_indices = np.where(Vd <= 0)[0]
+    if len(zero_indices) > 0:
+        G_zero = G[zero_indices[0]]/1000
+    else:
+        G_zero = G[np.argmin(np.abs(Vd))]/1000
+    G_intercept.append(G_zero)
+
+# Plotting G intercept for different P_thorax values
+fig, ax = plt.subplots()
+
+ax.plot(P_thorax / 1333, G_intercept, 'bo-')
+
+ax.set_xlabel('P_thorax (mmHg)')
+ax.set_ylabel('G Multiples')
+ax.set_title('G Tolerance for Varying Intrathoracic Pressures')
+plt.grid(True)
+plt.show()
+
+
