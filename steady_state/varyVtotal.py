@@ -7,9 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
 
-G = np.linspace(g_earth,3*980, 3000)
+G = np.linspace(g_earth,7*980, 3000)
 
-Vtotal = np.linspace(3, 100, 8)
+Vtotal = np.linspace(3, 10, 8)
 Vtotal = Vtotal*1000
 #P_thorax = np.linspace(- 4 * 1333, 24 * 1333,8)
 P_thorax = -4 * 1333
@@ -173,4 +173,6 @@ for n, plt_title in enumerate(Vtotal_titles):
     plt.xlabel("g multiple")
     plt.ylabel("VT0")
 plt.legend(Vtotal_titles)
+plt.grid(True)
+plt.show()
 plt.savefig("varyVT_VT0_vs_g_V0")
