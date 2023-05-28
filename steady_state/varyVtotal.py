@@ -11,7 +11,6 @@ G = np.linspace(g_earth,7*980, 3000)
 
 Vtotal = np.linspace(3, 10, 8)
 Vtotal = Vtotal*1000
-#P_thorax = np.linspace(- 4 * 1333, 24 * 1333,8)
 P_thorax = -4 * 1333
 P_RA = P_thorax + dP_RA
 
@@ -42,7 +41,7 @@ for j in range(len(Vtotal)):
             Ppv = P_thorax + (C_RVD / C_LVD) * dP_RA # eq 44
             Ppa = Ppv + Q * Rp
             Ppa_also = P_thorax + (C_RVD / C_LVD) * dP_RA + Q*Rp
-            # assert (nabs(Ppa - Ppa_also) < 0.01)
+        
             cases[j, i] = 1
         elif P_thorax > - dP_RA and P_thorax < rho * G[i] * Hu - dP_RA:
             Vd_total = Vtotal[j] - Cp * (C_RVD / C_LVD) * dP_RA \
@@ -64,22 +63,13 @@ for j in range(len(Vtotal)):
             F_also = (Gs * Psa_u_star +
                       (1/Rs_l)* (rho*G[i]*Hu-P_thorax - dP_RA)) / (
                       C_RVD*dP_RA)
-            # breakpoint()
-            # assert F == F_also, "F, equation 64 inconsistent"
-            # (Pdb) F
-            # 1.7248725549967021
-            # (Pdb) F_also
-            # 1.7494574795209836
+          
 
             Ppv = P_thorax + (C_RVD / C_LVD) * dP_RA # eq 66
             Ppa = Ppv + Q * Rp
             Ppa_also = (C_RVD / C_LVD) * dP_RA + Rp*(Gs*Psa_u_star + 1/Rs_l *
                         (rho * G[i] *Hu - P_thorax - dP_RA))
-            # (Pdb) Ppa
-            # 30219.708890709935
-            # (Pdb) Ppa_also
-            # 29308.135553880078
-            # assert Ppa == Ppa_also, "Ppa eq 67 inconsistent"
+         
             cases[j, i] = 2
         elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
             # print("entered case III")
@@ -94,20 +84,12 @@ for j in range(len(Vtotal)):
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
             Qs_u = (Psa_u_star - Psv_u) / Rs_u
             Qs_u_also = (Psa_u_star + rho*G[i]*Hu - P_thorax - dP_RA)/Rs_u
-            # assert  Qs_u == Qs_u_also, "QsU eq 81 inconsistent"
-            # (Pdb) Qs_u
-            # 40.523557770364924
-            # (Pdb) Qs_u_also
-            # 40.523557770364924
+           
 
-            # breakpoint()
+          
             Qs_l = (Psa_l - Psv_l) / Rs_l
             Qs_l_also = (Psa_u_star + rho*G[i]*Hu - P_thorax - dP_RA)/Rs_l
-            # Qs_l == Qs_l_also, "QsL eq 82 inconsistent"
-            # (Pdb) Qs_l
-            # 53.18716957360396
-            # (Pdb) Qs_l_also
-            # 53.18716957360396
+          
 
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
@@ -176,3 +158,20 @@ plt.legend(Vtotal_titles)
 plt.grid(True)
 plt.show()
 plt.savefig("varyVT_VT0_vs_g_V0")
+
+plt.figure(figsize=(12, 8))
+plt.title("G Tolerance vs total volume", fontsize=18)
+plt.xlabel("Vtotal (L)", fontsize=14)
+plt.ylabel("G Tolerance ", fontsize=14)
+
+for i in range(len(Vtotal)):
+    min_Vd_total = np.nanmin(sol_Vd_Vtotal_G[i, :])
+    if np.isnan(min_Vd_total):
+        g_intercept = G[np.isnan(sol_Vd_Vtotal_G[i, :])][-1]
+    else:
+        min_Vd_total_index = np.nanargmin(sol_Vd_Vtotal_G[i, :])
+        g_intercept = G[min_Vd_total_index]
+    plt.plot(Vtotal[i] / 1000, g_intercept, 'ro', markersize=6)
+
+plt.grid(True)
+plt.show()
