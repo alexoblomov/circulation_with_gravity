@@ -1,14 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
-
+import matplotlib as mpl
+mpl.rcParams['mathtext.fontset'] = 'cm'
 # Fix P_thorax to a single value
 P_thorax = -4 * 1333
 
 # Discretization
 dx = 100
-Hu_values = np.linspace(0.1 * Hu_patient, 3 * Hu_patient, dx)
-Hl_values = np.linspace(0.3 * Hl_patient, 1.3 * Hl_patient, dx)
+Hu_values = np.linspace(15, 80, dx)
+Hl_values = np.linspace(-10, -60, dx)
 
 Csa_u = Csa_u
 Csa_l = Csa_l
@@ -69,5 +70,7 @@ ax.set_xlabel(r'$H_{\mathrm{l}}$ $\mathrm{(cm)}$')
 ax.set_ylabel(r'$H_{\mathrm{u}}$ $\mathrm{(cm)}$')
 ax.set_title(r'$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Height}$ $\mathrm{Ratio}$')
 plt.colorbar(heatmap, label=r"$g$ $\mathrm{Multiples}$")
-plt.grid(True)
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.grid(False)
 plt.savefig('varyH_gtol_heatmap')

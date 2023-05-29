@@ -4,8 +4,10 @@ of interest
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from matplotlib import rc
 from parameters import *
+mpl.rcParams['mathtext.fontset'] = 'cm'
 
 G = np.linspace(g_earth,3*980, 3000)
 
@@ -118,7 +120,8 @@ fig, ax = plt.subplots()
 for i in range(len(P_thorax)):
     ax.plot(G, sol_Vd_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
 
-
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 ax.set_xlabel(r'$+\mathrm{Gz}$')
 ax.set_ylabel(r'$V_\mathrm{d}$ (L)')
 ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{for}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
@@ -163,8 +166,11 @@ ax.plot(P_thorax / 1333, G_intercept, 'bo-')
 ax.set_xlabel(r'$P_{\mathrm{thorax}}$ $\mathrm{(mmHg)}$')
 ax.set_ylabel(r'$g$ $\mathrm{Multiples}$')
 ax.set_title(r'$+$Gz $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 plt.grid(True)
 #plt.show()
+
 plt.savefig('varyPthorax_gtol_plot')
 
 

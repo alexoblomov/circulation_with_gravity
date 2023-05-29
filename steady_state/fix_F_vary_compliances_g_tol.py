@@ -1,14 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
-
+import matplotlib as mpl
+mpl.rcParams['mathtext.fontset'] = 'cm'
 # Fix P_thorax to a single value
 P_thorax = -4 * 1333
 
 # Discretization
 dx = 100
-Csa_u = np.linspace(0.01 * Csa_u, 10 * Csa_u, dx)
-Csa_l = np.linspace(0.01 * Csa_l, 10* Csa_l, dx)
+Csa_u = np.linspace(0.01 * Csa_u, 8 * Csa_u, dx)
+Csa_l = np.linspace(0.01 * Csa_l, 8* Csa_l, dx)
 
 Hu = Hu_patient
 Hl = Hl_patient
@@ -80,5 +81,7 @@ ax.set_xlabel('Csa_l (ml/mmHg)')
 ax.set_ylabel('Csa_u (ml/mmHg)')
 ax.set_title('G Tolerance Heatmap')
 plt.colorbar(heatmap, label='G Multiples')
-plt.grid(True)
-plt.show()
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.grid(False)
+#plt.show()
