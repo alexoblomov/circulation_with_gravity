@@ -157,7 +157,6 @@ for i in range(len(Vtotal)):
 # Enable LaTeX rendering
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-
 plt.grid(True)
 plt.savefig('varyVtotal_gtol_plot', bbox_inches='tight', dpi=300)
 
