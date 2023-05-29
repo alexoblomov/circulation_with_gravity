@@ -7,13 +7,13 @@ P_thorax = -4 * 1333
 
 # Discretization
 dx = 100
-Hu_values = np.linspace(0.5 * Hu_patient, 3 * Hu_patient, dx)
-Hl_values = np.linspace(0.5 * Hl_patient, 1 * Hl_patient, dx)
+Hu_values = np.linspace(0.1 * Hu_patient, 3 * Hu_patient, dx)
+Hl_values = np.linspace(0.3 * Hl_patient, 1.3 * Hl_patient, dx)
 
 Csa_u = Csa_u
 Csa_l = Csa_l
 
-# Initialize arrays to store G tolerance values
+# Initialize array to store G tolerance values
 G_tolerance = np.zeros((len(Hu_values), len(Hl_values)))
 
 # Loop over Hu and Hl values
@@ -56,11 +56,18 @@ for i in range(len(Hu_values)):
 
 # Plotting the heatmap
 fig, ax = plt.subplots()
-heatmap = ax.imshow(G_tolerance, cmap='jet', aspect='auto', origin='lower')
+heatmap = ax.imshow(G_tolerance, cmap='inferno', aspect='auto', origin='lower')
+# Update x and y tick labels with Hu_values and Hl_values
+x_tick_indices = np.linspace(0, len(Hl_values) - 1, 5, dtype=int)
+y_tick_indices = np.linspace(0, len(Hu_values) - 1, 5, dtype=int)
+ax.set_xticks(x_tick_indices)
+ax.set_yticks(y_tick_indices)
+ax.set_xticklabels([f'{-Hl_values[i]:.1f}' for i in x_tick_indices])
+ax.set_yticklabels([f'{Hu_values[i]:.1f}' for i in y_tick_indices])
 
-ax.set_xlabel('Hl (cm)')
-ax.set_ylabel('Hu (cm)')
-ax.set_title('G Tolerance Heatmap')
-plt.colorbar(heatmap, label='G Multiples')
+ax.set_xlabel(r'$H_{\mathrm{l}}$ $\mathrm{(cm)}$')
+ax.set_ylabel(r'$H_{\mathrm{u}}$ $\mathrm{(cm)}$')
+ax.set_title(r'$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Height}$ $\mathrm{Ratio}$')
+plt.colorbar(heatmap, label=r"$g$ $\mathrm{Multiples}$")
 plt.grid(True)
-plt.show()
+plt.savefig('varyH_gtol_heatmap')
