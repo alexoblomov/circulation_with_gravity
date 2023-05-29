@@ -4,6 +4,7 @@ of interest
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import rc
 from parameters import *
 
 G = np.linspace(g_earth,3*980, 3000)
@@ -110,19 +111,22 @@ sol_F_Pthorax_G = sol_F_Pthorax_G * 60
 sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G / 1333
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
 
+
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
 
 for i in range(len(P_thorax)):
     ax.plot(G, sol_Vd_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
 
-ax.set_xlabel('Gz')
-ax.set_ylabel('Vd (L)')
-ax.set_title('Reserve Volume vs Acceleration for varying P_thorax')
+
+ax.set_xlabel(r'$+\mathrm{Gz}$')
+ax.set_ylabel(r'$V_\mathrm{d}$ (L)')
+ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{for}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 ax.legend()
 ax.set_xlim(1, 2.3)
 plt.grid(True)
-plt.show()
+plt.savefig('varyPthorax_Vd_G')
+#plt.show()
 
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
@@ -130,13 +134,14 @@ fig, ax = plt.subplots()
 for i in range(len(P_thorax)):
     ax.plot(G, sol_F_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
 
-ax.set_xlabel('Gz')
-ax.set_ylabel('F (beats/min)')
-ax.set_title('Heart Rate vs Acceleration for Varying P_thorax')
+ax.set_xlabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{Multiples})$')
+ax.set_ylabel(r'$F$ $\mathrm{(beats/min)}$')
+ax.set_title(r'$\mathrm{Heart}$ $\mathrm{Rate}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{for}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 ax.legend()
 ax.set_xlim(1, 2.3)
 plt.grid(True)
-plt.show()
+#plt.show()
+plt.savefig('varyPthorax_F_G')
 
 # Finding G intercept where Vd = 0 for different P_thorax values
 G_intercept = []
@@ -155,10 +160,12 @@ fig, ax = plt.subplots()
 
 ax.plot(P_thorax / 1333, G_intercept, 'bo-')
 
-ax.set_xlabel('P_thorax (mmHg)')
-ax.set_ylabel('G Multiples')
-ax.set_title('G Tolerance for Varying Intrathoracic Pressures')
+ax.set_xlabel(r'$P_{\mathrm{thorax}}$ $\mathrm{(mmHg)}$')
+ax.set_ylabel(r'$g$ $\mathrm{Multiples}$')
+ax.set_title(r'$+$Gz $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 plt.grid(True)
-plt.show()
+#plt.show()
+plt.savefig('varyPthorax_gtol_plot')
+
 
 
