@@ -1,15 +1,16 @@
 """
 Purpose: simulate model with varying values of G and plot output variables
 of interest
-Nb case III is only actualized when P_thorax is roughly 70x its nominal value
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from parameters import *
+mpl.rcParams['mathtext.fontset'] = 'cm'
 
 G = np.linspace(g_earth,7*980, 3000)
 
-Vtotal = np.linspace(3, 10, 8)
+Vtotal = np.linspace(3, 8, 6)
 Vtotal = Vtotal*1000
 P_thorax = -4 * 1333
 P_RA = P_thorax + dP_RA
@@ -120,27 +121,9 @@ sol_Vd_Vtotal_G = sol_Vd_Vtotal_G / 1000
 
 plt.figure(figsize=(15, 12))
 plt.subplots_adjust(hspace=0.5)
-plt.suptitle("Reserve volume vs g", fontsize=18, y=0.95)
-Vtotal_titles = ["Total volume " + str(vtot/1000) + " L" for vtot in Vtotal]
-# loop through the length of tickers and keep track of index
-for n, plt_title in enumerate(Vtotal_titles):
-    # add a new subplot iteratively
-    ax = plt.subplot(4, 2, n + 1)
+plt.suptitle(r"$\mathrm{Reserve}$ $\mathrm{volume}$ v. g", fontsize=18, y=0.95)
+Vtotal_titles = [r"$\mathrm{Total}$ $\mathrm{volume}$ " + str(vtot/1000) + r" $\mathrm{L}$" for vtot in Vtotal]
 
-    # filter df and plot ticker on the new subplot axis
-    idx_case_1 = cases == 1
-    idx_case_2 = cases == 2
-    idx_case_3 = cases == 3
-    ax.plot(G,sol_Vd_Vtotal_G[n,:])
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_2],'g')
-    # ax.plot(G,sol_Vd_Pthorax_G[n,idx_case_3],'b')
-    # chart formatting
-    ax.set_title(plt_title)
-    # ax.get_legend().remove()
-    ax.set_xlabel("g multiple")
-    ax.set_ylabel("VT0")
-# plt.show()
-plt.savefig("varyVtot_VT0_vs_g_V0_w_height_factor.png")
 
 plt.figure()
 for n, plt_title in enumerate(Vtotal_titles):
@@ -150,19 +133,18 @@ for n, plt_title in enumerate(Vtotal_titles):
     idx_case_2 = cases == 2
     idx_case_3 = cases == 3
     plt.plot(G, sol_Vd_Vtotal_G[n, :])
-    plt.title('Reserve Volume v. Acceleration')
+    plt.title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$')
     # ax.get_legend().remove()
-    plt.xlabel("g multiple")
-    plt.ylabel("VT0")
+    plt.xlabel(r"$g$ $\mathrm{multiple}$")
+    plt.ylabel(r"$V_{\mathrm{total}}^0$")
 plt.legend(Vtotal_titles)
 plt.grid(True)
-plt.show()
 plt.savefig("varyVT_VT0_vs_g_V0")
 
-plt.figure(figsize=(12, 8))
-plt.title("G Tolerance vs total volume", fontsize=18)
-plt.xlabel("Vtotal (L)", fontsize=14)
-plt.ylabel("G Tolerance ", fontsize=14)
+plt.figure()
+plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{varying}$ $\mathrm{Total}$ $\mathrm{Volume}$")
+plt.xlabel(r"$V_\mathrm{total}$ $\mathrm{(L)}$")
+plt.ylabel(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $(g$ $\mathrm{multiples})$")
 
 for i in range(len(Vtotal)):
     min_Vd_total = np.nanmin(sol_Vd_Vtotal_G[i, :])
@@ -171,7 +153,11 @@ for i in range(len(Vtotal)):
     else:
         min_Vd_total_index = np.nanargmin(sol_Vd_Vtotal_G[i, :])
         g_intercept = G[min_Vd_total_index]
-    plt.plot(Vtotal[i] / 1000, g_intercept, 'ro', markersize=6)
+    plt.plot(Vtotal[i] / 1000, g_intercept, 'bo-', markersize=6)
+# Enable LaTeX rendering
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 
 plt.grid(True)
-plt.show()
+plt.savefig('varyVtotal_gtol_plot', bbox_inches='tight', dpi=300)
+
