@@ -7,8 +7,8 @@ P_thorax = -4 * 1333
 
 # Discretization
 dx = 100
-Csa_u = np.linspace(0.5 * Csa_u, 1.5 * Csa_u, dx)
-Csa_l = np.linspace(0.5 * Csa_l, 1.5 * Csa_l, dx)
+Csa_u = np.linspace(0.01 * Csa_u, 10 * Csa_u, dx)
+Csa_l = np.linspace(0.01 * Csa_l, 10* Csa_l, dx)
 
 Hu = Hu_patient
 Hl = Hl_patient
@@ -53,6 +53,24 @@ for i in range(len(Csa_u)):
             G_tolerance[i, j] = G[zero_indices[0]] / 1000
         else:
             G_tolerance[i, j] = G[np.argmin(np.abs(Vd_total_vec))] / 1000
+
+# Plotting the heatmap
+fig, ax = plt.subplots()
+heatmap = ax.imshow(G_tolerance, cmap='inferno', aspect='auto', origin='lower')
+
+x_tick_indices = np.linspace(0, len(Csa_l) - 1, 5, dtype=int)
+y_tick_indices = np.linspace(0, len(Csa_u) - 1, 5, dtype=int)
+ax.set_xticks(x_tick_indices)
+ax.set_yticks(y_tick_indices)
+ax.set_xticklabels([f'{Csa_l[i]:.3f}' for i in x_tick_indices])
+ax.set_yticklabels([f'{Csa_u[i]:.3f}' for i in y_tick_indices])
+
+ax.set_xlabel(r'$C_{\mathrm{sa}}^{\mathrm{l}}$ (ml/mmHg)')
+ax.set_ylabel(r'$C_{\mathrm{sa}}^{\mathrm{u}}$ (ml/mmHg)')
+ax.set_title(r'$\mathrm{+Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Arterial}$ $\mathrm{Compliances}$')
+plt.colorbar(heatmap, label=r'$g$ $\mathrm{Multiples}$')
+plt.grid(True)
+plt.savefig('vary_Csa_gtol_heatmap')
 
 # Plotting the heatmap
 fig, ax = plt.subplots()
