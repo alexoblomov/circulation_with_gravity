@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from parameters import *
+from parameters import *
 import matplotlib as mpl
 mpl.rcParams['mathtext.fontset'] = 'cm'
 # Fix P_thorax to a single value
@@ -66,11 +67,11 @@ ax.set_yticks(y_tick_indices)
 ax.set_xticklabels([f'{Csa_l[i]:.3f}' for i in x_tick_indices])
 ax.set_yticklabels([f'{Csa_u[i]:.3f}' for i in y_tick_indices])
 
-ax.set_xlabel(r'$C_{\mathrm{sa}}^{\mathrm{l}}$ (ml/mmHg)')
-ax.set_ylabel(r'$C_{\mathrm{sa}}^{\mathrm{u}}$ (ml/mmHg)')
+ax.set_xlabel(r'$C_{\mathrm{sa}}^{\mathrm{l}}$ $\mathrm{(ml/mmHg)}$')
+ax.set_ylabel(r'$C_{\mathrm{sa}}^{\mathrm{u}}$ $\mathrm{(ml/mmHg)}$')
 ax.set_title(r'$\mathrm{+Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Arterial}$ $\mathrm{Compliances}$')
 plt.colorbar(heatmap, label=r'$g$ $\mathrm{Multiples}$')
-plt.grid(True)
+plt.grid(False)
 plt.savefig('vary_Csa_gtol_heatmap')
 
 # Plotting the heatmap
@@ -80,6 +81,7 @@ heatmap = ax.imshow(G_tolerance, cmap='jet', aspect='auto', origin='lower')
 ax.set_xlabel('Csa_l (ml/mmHg)')
 ax.set_ylabel('Csa_u (ml/mmHg)')
 ax.set_title('G Tolerance Heatmap')
+ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
 plt.colorbar(heatmap, label='G Multiples')
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
