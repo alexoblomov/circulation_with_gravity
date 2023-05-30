@@ -113,29 +113,28 @@ sol_F_Pthorax_G = sol_F_Pthorax_G * 60
 sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G / 1333
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
 
-
+P_thorax_string = r'$P_\mathrm{thorax}$'
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
 
-for i in range(len(P_thorax)):
-    ax.plot(G, sol_Vd_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+for i in range(len(P_thorax)):
+    ax.plot(G, sol_Vd_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} mmHg')
 ax.set_xlabel(r'$+\mathrm{Gz}$')
-ax.set_ylabel(r'$V_\mathrm{d}$ (L)')
+ax.set_ylabel(r'$V_\mathrm{d}$ $\mathrm{(L)}$')
 ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{for}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 ax.legend()
 ax.set_xlim(1, 2.3)
+ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
+plt.rc('font', family='serif')  # Set font family to use LaTeX font
 plt.grid(True)
 plt.savefig('varyPthorax_Vd_G')
-#plt.show()
 
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
 
 for i in range(len(P_thorax)):
-    ax.plot(G, sol_F_Pthorax_G[i, :], label=f'P_thorax = {P_thorax[i]/1333} mmHg')
+    ax.plot(G, sol_F_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} mmHg')
 
 ax.set_xlabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{Multiples})$')
 ax.set_ylabel(r'$F$ $\mathrm{(beats/min)}$')
@@ -164,8 +163,8 @@ fig, ax = plt.subplots()
 ax.plot(P_thorax / 1333, G_intercept, 'bo-')
 
 ax.set_xlabel(r'$P_{\mathrm{thorax}}$ $\mathrm{(mmHg)}$')
-ax.set_ylabel(r'$g$ $\mathrm{Multiples}$')
-ax.set_title(r'$+$Gz $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
+ax.set_ylabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{Multiples})$')
+ax.set_title(r'$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.grid(True)
