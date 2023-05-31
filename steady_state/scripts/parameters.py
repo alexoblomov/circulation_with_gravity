@@ -11,6 +11,7 @@ resistances in (dynes/cm2)/(cm^3/s) - force/area / flow (vol/time)
 Ts, the time constant is in seconds
 density is in g/cm3
 """
+color_map = 'plasma' #initialize MPL color map for uniform results
 Psa_u_star = 100 * 1333
 
 Psa_u = Psa_u_star
@@ -41,8 +42,8 @@ C_RVD = (0.035 / 1333) * 1000
 
 C_LVD = (0.00583 / 1333) * 1000
 
-Csa_l = Hl_factor * (0.00175 / 1333) * 1000
-Csa_u = Hu_factor * (0.00175 / 1333) * 1000
+Csa_l = Hl_factor * (0.00175 / 1333) * 1000 
+Csa_u = Hu_factor * (0.00175 / 1333) * 1000 
 Csv_l = Hl_factor * (0.09 / 1333) * 1000
 Csv_u = Hu_factor * (0.09 / 1333) * 1000
 Cs_l = Csa_l + Csv_l

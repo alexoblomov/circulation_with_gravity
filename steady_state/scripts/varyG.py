@@ -9,9 +9,24 @@ from matplotlib import rc
 from parameters import *
 mpl.rcParams['mathtext.fontset'] = 'cm'
 
+# Enable LaTeX rendering
+mpl.rcParams['text.usetex'] = True
+
+# Set the font family to serif
+mpl.rcParams['font.family'] = 'serif'
+
+
+
 G = np.linspace(g_earth,3*980, 3000)
 
-P_thorax = np.linspace(- 4 * 1333, 24 * 1333,8)
+P_thorax = np.linspace(- 4 * 1333, 24 * 1333, 8)
+# Define shades of red and yellow
+red_shades = np.linspace(1, 0, len(P_thorax))  # From 1 (bright red) to 0 (dark red)
+yellow_shades = np.linspace(0.8, 0, len(P_thorax))  # From 1 (bright yellow) to 0 (dark yellow)
+
+# Convert shades to colors in the colormap
+cmap = plt.cm.get_cmap(color_map)  # Get the colormap
+line_colors = [cmap(shade) for shade in np.concatenate([red_shades, yellow_shades])]
 
 P_RA = P_thorax + dP_RA
 
@@ -114,59 +129,51 @@ sol_Ppa_Pthorax_G = sol_Ppa_Pthorax_G / 1333
 sol_Vd_Pthorax_G = sol_Vd_Pthorax_G / 1000
 
 P_thorax_string = r'$P_\mathrm{thorax}$'
+mmHg = r'$\mathrm{mmHg}$'
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
-
-plt.set_cmap('inferno')
 for i in range(len(P_thorax)):
-    ax.plot(G, sol_Vd_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} mmHg')
-ax.set_xlabel(r'$+\mathrm{Gz}$')
-ax.set_ylabel(r'$V_\mathrm{d}$ $\mathrm{(L)}$')
-ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{for}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
+    ax.plot(G, sol_Vd_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} {mmHg}', color=line_colors[i])
+ax.set_xlabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{multiples})$')
+ax.set_ylabel(r"$V_{\mathrm{total}}^0$ $(\mathrm{L}$)")
+ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 ax.legend()
 ax.set_xlim(1, 2.3)
-ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
+ax.tick_params(axis='both', labelsize=10)  # Set tick label font size
 plt.rc('font', family='serif')  # Set font family to use LaTeX font
 plt.grid(True)
-plt.savefig('varyPthorax_Vd_G')
+plt.savefig('figures/varyPthorax_Vd_G', bbox_inches='tight', dpi=300)
 
 # Plotting G against Vd for different P_thorax values
-fig, ax = plt.subplots()
-plt.set_cmap('inferno')
+plt.figure()
 for i in range(len(P_thorax)):
-    ax.plot(G, sol_F_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} mmHg')
-
-ax.set_xlabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{Multiples})$')
-ax.set_ylabel(r'$F$ $\mathrm{(beats/min)}$')
-ax.set_title(r'$\mathrm{Heart}$ $\mathrm{Rate}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{for}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
-ax.legend()
-ax.set_xlim(1, 2.3)
+    plt.plot(G, sol_F_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} {mmHg}', color=line_colors[i])
+plt.xlabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{multiples})$')
+plt.ylabel(r'$F$ $\mathrm{(beats/min)}$')
+plt.title(r'$\mathrm{Heart}$ $\mathrm{Rate}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
+plt.legend()
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.xlim(1, 2.3)
 plt.grid(True)
 #plt.show()
-plt.savefig('varyPthorax_F_G')
+plt.savefig('figures/varyPthorax_F_G', bbox_inches='tight', dpi=300)
 
-# Finding G intercept where Vd = 0 for different P_thorax values
-G_intercept = []
+
+plt.figure()
+plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressure}$")
+plt.xlabel(r"$P_\mathrm{thorax}$ $\mathrm{(mmHg)}$")
+plt.ylabel(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $(g$ $\mathrm{multiples})$")
 for i in range(len(P_thorax)):
-    Vd = sol_Vd_Pthorax_G[i, :]
-    G = np.linspace(g_earth, 3 * 980, 3000)
-    zero_indices = np.where(Vd <= 0)[0]
-    if len(zero_indices) > 0:
-        G_zero = G[zero_indices[0]]/1000
+    min_Vd_total = np.nanmin(sol_Vd_Pthorax_G[i, :])
+    if np.isnan(min_Vd_total):
+        g_intercept = G[np.isnan(sol_Vd_Pthorax_G[i, :])][-1]
     else:
-        G_zero = G[np.argmin(np.abs(Vd))]/1000
-    G_intercept.append(G_zero)
-
-# Plotting G intercept for different P_thorax values
-fig, ax = plt.subplots()
-
-ax.plot(P_thorax / 1333, G_intercept, 'bo-')
-
-ax.set_xlabel(r'$P_{\mathrm{thorax}}$ $\mathrm{(mmHg)}$')
-ax.set_ylabel(r'$+\mathrm{Gz}$ $(g$ $\mathrm{Multiples})$')
-ax.set_title(r'$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
+        min_Vd_total_index = np.nanargmin(sol_Vd_Pthorax_G[i, :])
+        g_intercept = G[min_Vd_total_index]
+    plt.plot(P_thorax[i] / 1333, g_intercept, 'o-', markersize=6, color=line_colors[i])
+# Enable LaTeX rendering
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.grid(True)
-#plt.show()
-
+plt.savefig('figures/varyPthorax_gtol_plot', bbox_inches='tight', dpi=300)

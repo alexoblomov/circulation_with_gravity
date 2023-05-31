@@ -8,9 +8,9 @@ mpl.rcParams['mathtext.fontset'] = 'cm'
 P_thorax = -4 * 1333
 
 # Discretization
-dx = 100
-Csa_u = np.linspace(0.01 * Csa_u, 8 * Csa_u, dx)
-Csa_l = np.linspace(0.01 * Csa_l, 8* Csa_l, dx)
+dx = 90
+Csa_u = np.linspace(0.0001, 0.001, dx)
+Csa_l = np.linspace(0.0001, 0.001, dx)
 
 Hu = Hu_patient
 Hl = Hl_patient
@@ -57,37 +57,25 @@ for i in range(len(Csa_u)):
             G_tolerance[i, j] = G[np.argmin(np.abs(Vd_total_vec))] / 1000
 
 # Plotting the heatmap
-fig, ax = plt.subplots()
-heatmap = ax.imshow(G_tolerance, cmap='inferno', aspect='auto', origin='lower')
-
-x_tick_indices = np.linspace(0, len(Csa_l) - 1, 5, dtype=int)
-y_tick_indices = np.linspace(0, len(Csa_u) - 1, 5, dtype=int)
-ax.set_xticks(x_tick_indices)
-ax.set_yticks(y_tick_indices)
-ax.set_xticklabels([f'{Csa_l[i]:.3f}' for i in x_tick_indices])
-ax.set_yticklabels([f'{Csa_u[i]:.3f}' for i in y_tick_indices])
-
-ax.set_xlabel(r'$C_{\mathrm{sa}}^{\mathrm{l}}$ $\mathrm{(ml/mmHg)}$')
-ax.set_ylabel(r'$C_{\mathrm{sa}}^{\mathrm{u}}$ $\mathrm{(ml/mmHg)}$')
-ax.set_title(r'$\mathrm{+Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Arterial}$ $\mathrm{Compliances}$')
-ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
-plt.colorbar(heatmap, label=r'$g$ $\mathrm{Multiples}$')
-# Customize color bar tick labels
-cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{Multiples}$")
-cbar.ax.tick_params(labelsize=8)
-plt.grid(False)
-plt.savefig('vary_Csa_gtol_heatmap')
-
-# Plotting the heatmap
-fig, ax = plt.subplots()
-heatmap = ax.imshow(G_tolerance, cmap='inferno', aspect='auto', origin='lower')
-
-ax.set_xlabel('Csa_l (ml/mmHg)')
-ax.set_ylabel('Csa_u (ml/mmHg)')
-ax.set_title('G Tolerance Heatmap')
-ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
-plt.colorbar(heatmap, label='G Multiples')
+plt.figure()
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
+heatmap = plt.imshow(G_tolerance, cmap=color_map, aspect='auto', origin='lower')
+
+x_tick_indices = np.linspace(0, len(Csa_l) - 1 , 5, dtype=int)
+y_tick_indices = np.linspace(0, len(Csa_u) - 1, 5, dtype=int)
+x_tick_labels = [f'{Csa_l[i]:.5f}' for i in x_tick_indices]
+y_tick_labels = [f'{Csa_u[i]:.5f}' for i in y_tick_indices]
+
+plt.xticks(x_tick_indices, [float(label) for label in x_tick_labels])
+plt.yticks(y_tick_indices, [float(label) for label in y_tick_labels])
+
+plt.xlabel(r'$C_{\mathrm{sa}}^{\mathrm{l}}$ $\mathrm{(ml/mmHg)}$')
+plt.ylabel(r'$C_{\mathrm{sa}}^{\mathrm{u}}$ $\mathrm{(ml/mmHg)}$')
+plt.title(r'$\mathrm{+Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Arterial}$ $\mathrm{Compliances}$')
+plt.tick_params(axis='both')  # Set tick label font 
+cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{multiples}$")
+
+
 plt.grid(False)
-#plt.show()
+plt.savefig('figures/varyCsa_gtol', bbox_inches='tight', dpi=300)
