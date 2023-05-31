@@ -119,11 +119,20 @@ sol_F_Vtotal_G = sol_F_Vtotal_G * 60
 sol_Ppa_Vtotal_G = sol_Ppa_Vtotal_G / 1333
 sol_Vd_Vtotal_G = sol_Vd_Vtotal_G / 1000
 
+# Define shades of red and yellow
+red_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright red) to 0 (dark red)
+yellow_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright yellow) to 0 (dark yellow)
+
+# Convert shades to colors in the colormap
+cmap = plt.cm.get_cmap(color_map)  # Get the colormap
+line_colors = [cmap(shade) for shade in np.concatenate([red_shades, yellow_shades])]
+Vtotal_string = r'$V_\mathrm{total}$'
 plt.figure(figsize=(15, 12))
 plt.subplots_adjust(hspace=0.5)
 plt.suptitle(r"$\mathrm{Reserve}$ $\mathrm{volume}$ v. g", fontsize=18, y=0.95)
-Vtotal_titles = [r"$\mathrm{Total}$ $\mathrm{volume}$ " + str(vtot/1000) + r" $\mathrm{L}$" for vtot in Vtotal]
-
+Vtotal_titles = [Vtotal_string + " $=$ " + str(vtot/1000) + r" $\mathrm{L}$" for vtot in Vtotal]
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 
 plt.figure()
 for n, plt_title in enumerate(Vtotal_titles):
@@ -132,17 +141,18 @@ for n, plt_title in enumerate(Vtotal_titles):
     idx_case_1 = cases == 1
     idx_case_2 = cases == 2
     idx_case_3 = cases == 3
-    plt.plot(G, sol_Vd_Vtotal_G[n, :])
-    plt.title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$')
+    plt.plot(G, sol_Vd_Vtotal_G[n, :], color=line_colors[n])
+    plt.title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$')
     # ax.get_legend().remove()
-    plt.xlabel(r"$g$ $\mathrm{multiple}$")
-    plt.ylabel(r"$V_{\mathrm{total}}^0$")
+    plt.xlabel(r"$g$ $\mathrm{multiples}$")
+    plt.ylabel(r"$V_{\mathrm{total}}^0$ $(\mathrm{L})$")
+    
 plt.legend(Vtotal_titles)
 plt.grid(True)
-plt.savefig("varyVT_VT0_vs_g_V0")
+plt.savefig("figures/varyVT_VT0_vs_g_V0", bbox_inches='tight', dpi=300)
 
 plt.figure()
-plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{varying}$ $\mathrm{Total}$ $\mathrm{Volume}$")
+plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$")
 plt.xlabel(r"$V_\mathrm{total}$ $\mathrm{(L)}$")
 plt.ylabel(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $(g$ $\mathrm{multiples})$")
 
@@ -153,10 +163,11 @@ for i in range(len(Vtotal)):
     else:
         min_Vd_total_index = np.nanargmin(sol_Vd_Vtotal_G[i, :])
         g_intercept = G[min_Vd_total_index]
-    plt.plot(Vtotal[i] / 1000, g_intercept, 'bo-', markersize=6)
+    plt.plot(Vtotal[i] / 1000, g_intercept, 'o-', markersize=6, color=line_colors[i])
 # Enable LaTeX rendering
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.grid(True)
-plt.savefig('varyVtotal_gtol_plot', bbox_inches='tight', dpi=300)
+# Specify the file path for saving the figure
+plt.savefig("figures/varyVtotal_gtol_plot.png", bbox_inches='tight', dpi=300)
 
