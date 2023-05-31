@@ -117,7 +117,7 @@ P_thorax_string = r'$P_\mathrm{thorax}$'
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
 
-
+plt.set_cmap('inferno')
 for i in range(len(P_thorax)):
     ax.plot(G, sol_Vd_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} mmHg')
 ax.set_xlabel(r'$+\mathrm{Gz}$')
@@ -132,7 +132,7 @@ plt.savefig('varyPthorax_Vd_G')
 
 # Plotting G against Vd for different P_thorax values
 fig, ax = plt.subplots()
-
+plt.set_cmap('inferno')
 for i in range(len(P_thorax)):
     ax.plot(G, sol_F_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} mmHg')
 
@@ -169,8 +169,4 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.grid(True)
 #plt.show()
-
-plt.savefig('varyPthorax_gtol_plot')
-
-
 

@@ -66,12 +66,16 @@ ax.set_xticks(x_tick_indices)
 ax.set_yticks(y_tick_indices)
 ax.set_xticklabels([f'{-Hl_values[i]:.1f}' for i in x_tick_indices])
 ax.set_yticklabels([f'{Hu_values[i]:.1f}' for i in y_tick_indices])
+ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
 
 ax.set_xlabel(r'$H_{\mathrm{l}}$ $\mathrm{(cm)}$')
 ax.set_ylabel(r'$H_{\mathrm{u}}$ $\mathrm{(cm)}$')
 ax.set_title(r'$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Height}$ $\mathrm{Ratio}$')
 ax.tick_params(axis='both', labelsize=8)  # Set tick label font size
 plt.colorbar(heatmap, label=r"$g$ $\mathrm{Multiples}$")
+# Customize color bar tick labels
+cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{Multiples}$")
+cbar.ax.tick_params(labelsize=8)
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.grid(False)
