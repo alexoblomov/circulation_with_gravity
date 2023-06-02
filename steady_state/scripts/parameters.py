@@ -16,7 +16,6 @@ Psa_u_star = 100 * 1333
 
 Psa_u = Psa_u_star
 dP_RA = 2 * 1333
-height = 167.64
 
 Hu_patient = 32
 Hl_patient = -42

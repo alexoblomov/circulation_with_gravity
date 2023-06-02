@@ -69,12 +69,12 @@ for j in range(len(P_thorax)):
             Psv_l = - rho * G[i] * Hl + P_thorax[j] + dP_RA
             Psv_u = 0
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
-            # Qs_u = Psa_u_star / Rs_u
-            # Qs_l = (Psa_l - Psv_l) / Rs_l
-            Qs_u = Psa_u_star * 1 / Rs_u # eq 61
+            
+            Qs_u = Psa_u_star / Rs_u # eq 61
             #eq 62
             Qs_l = (Psa_u_star + rho * G[i] * Hu \
                     - P_thorax[j]-dP_RA) * 1/Rs_l
+            #Qs_l = (Psa_l - Psv_l) / Rs_l
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
             F_also = (Gs * Psa_u_star +
@@ -144,7 +144,7 @@ plt.rc('font', family='serif')  # Set font family to use LaTeX font
 plt.grid(True)
 plt.savefig('figures/varyPthorax_Vd_G', bbox_inches='tight', dpi=300)
 
-# Plotting G against Vd for different P_thorax values
+# Plotting G against F for different P_thorax values
 plt.figure()
 for i in range(len(P_thorax)):
     plt.plot(G, sol_F_Pthorax_G[i, :], label=fr'{P_thorax_string} = {P_thorax[i]/1333} {mmHg}', color=line_colors[i])
