@@ -119,6 +119,12 @@ sol_F_Vtotal_G = sol_F_Vtotal_G * 60
 sol_Ppa_Vtotal_G = sol_Ppa_Vtotal_G / 1333
 sol_Vd_Vtotal_G = sol_Vd_Vtotal_G / 1000
 
+Vtotal_string = r'$V_\mathrm{total}$'
+L = r'$\mathrm{L}$'
+
+Vtotal_titles = [Vtotal_string + " $=$ " + str(vtot/1000) + r" $\mathrm{L}$" for vtot in Vtotal]
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 # Define shades of red and yellow
 red_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright red) to 0 (dark red)
 yellow_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright yellow) to 0 (dark yellow)
@@ -126,13 +132,24 @@ yellow_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright yellow) to 0 (d
 # Convert shades to colors in the colormap
 cmap = plt.cm.get_cmap(color_map)  # Get the colormap
 line_colors = [cmap(shade) for shade in np.concatenate([red_shades, yellow_shades])]
-Vtotal_string = r'$V_\mathrm{total}$'
+
+plt.figure()
+plt.title(r'$\mathrm{Heart}$ $\mathrm{Rate}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$')
+plt.xlabel(r"$g$ $\mathrm{multiples}$")
+plt.ylabel(r"$F$ $(\mathrm{beats/min})$")
+for n, plt_title in enumerate(Vtotal_titles):
+    # Create a copy of the data to avoid overwriting
+    F_values = np.copy(sol_F_Vtotal_G[n, :])
+    plt.plot(G, F_values, color=line_colors[n])
+    
+plt.legend(Vtotal_titles)
+plt.grid(True)
+plt.savefig("figures/varyVtotal_F_G", bbox_inches='tight', dpi=300)
 plt.figure(figsize=(15, 12))
 plt.subplots_adjust(hspace=0.5)
 plt.suptitle(r"$\mathrm{Reserve}$ $\mathrm{volume}$ v. g", fontsize=18, y=0.95)
-Vtotal_titles = [Vtotal_string + " $=$ " + str(vtot/1000) + r" $\mathrm{L}$" for vtot in Vtotal]
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+
+
 
 plt.figure()
 for n, plt_title in enumerate(Vtotal_titles):
@@ -149,7 +166,7 @@ for n, plt_title in enumerate(Vtotal_titles):
     
 plt.legend(Vtotal_titles)
 plt.grid(True)
-plt.savefig("figures/varyVT_VT0_vs_g_V0", bbox_inches='tight', dpi=300)
+plt.savefig("figures/varyVtotal_V0_G", bbox_inches='tight', dpi=300)
 
 plt.figure()
 plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$")
