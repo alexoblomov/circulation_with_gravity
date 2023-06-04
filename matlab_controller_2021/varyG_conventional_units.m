@@ -6,8 +6,8 @@ Psa_u = Psa_u_star;
 dP_RA = 2*1333;
 
 height = 167.64; %cm
-Hu = 0.5*32; %32;%cm %upper   32
-Hl = -(0.5*42);%cm %lower 42
+Hu = 0.5*32; %32;%cm 32 is heat to eyeball. averaging over compartment in order to represent to represent that the blood is not pooled in the eyeball slice
+Hl = -(0.5*42);%cm %lower 42 (heart to seat). averaging over lower compartment to model the distribution of blood in that compartment (bernoulli principle of fluid dynamics)
 
 rho = 1; %g/cm^3
 g_earth = 980; %gravitational acceleration cm/s^2
