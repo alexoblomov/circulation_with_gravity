@@ -21,8 +21,8 @@ height = 167.64
 # fluid dynamics)
 
 Hu_patient = 0.5*32 # (heart 2 eyeball)
-Hl_patient = -0.5*42 # (heart 2 seat)
-lumped_height = Hu_patient + (-Hl_patient)
+Hl_patient = 0.5*42 # (heart 2 seat)
+lumped_height = Hu_patient + (Hl_patient)
 
 Hu_factor = 1/3
 Hl_factor = 2/3
