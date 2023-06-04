@@ -1,20 +1,20 @@
 clear all
 close all
 
-Psa_u_star = 100*1333; %mmHg * [ dynes/(mmHg*cm^2) ]
+Psa_u_star = 53*1333; %100mmHg * [ dynes/(mmHg*cm^2) ]
 Psa_u = Psa_u_star; 
-dP_RA = 2*1333;
+dP_RA = 2*1333; %2 mm Hg * [ dynes/(mmHg*cm^2) ] %RA
 
 height = 167.64; %cm
-Hu = 0.5*32; %32;%cm %upper   32 %%%% THIS 1/2 REPRESENTS AVG COMPARTMENT HEIGHT %%%
-Hl = -(0.5*42);%cm %lower 42
+Hu = 37.25; %0.5*32;%cm %upper compartment   32
+Hl = -(0.5*45);%cm %lower 42
 
-rho = 1; %g/cm^3
+rho = 1; %g/cm^3   density of blood 
 g_earth = 980; %gravitational acceleration cm/s^2
-G = linspace(980,980*10, 10000); %cm/s^2
+G = linspace(0,980*10, 10000); %cm/s^2
 
-Rs = (16.49)*1333/(1000/60); %default 17.86, 16.49-20.02 (too high) systemic resistance (mmHg/(liters/s))
-Gs = 1/Rs;
+Rs = (20)*1333/(1000/60); %default 17.86, **16.49**-20.02 [mmHg *min/L] (too high) systemic resistance (mmHg/(liters/s))
+Gs = 1/Rs; %conductance = 1/resistance, resitance = pressure/flow
 Gs_u = (1/3)*Gs;
 Gs_l = (2/3)*Gs; 
 Rs_l = 1/Gs_l;
@@ -24,16 +24,21 @@ Rp = (1.61*1333)/(1000/60); %pulmonic resistance (mmHg/(liters/s))
 C_RVD = (0.0350/1333)*1000; %right-ventricular diastolic compliance (liters/mmHg)
 C_LVD = (0.00583/1333)*1000; %left-ventricular diastolic compliance (liters/mmHg)
 
-Csa_l = [(2/3)*(0.0012/1333)*1000 (2/3)*(0.0018/1333)*1000 (2/3)*(0.002/1333)*1000];
-Csa_u = [(1/3)*(0.0012/1333)*1000 (1/3)*(0.0018/1333)*1000 (1/3)*(0.002/1333)*1000]; 
+% 5 risk factors, 2 risk factors, >65, younger
+Csa_vec = [0.0012*0.58, 0.0012*0.80, 0.0012, 0.0018, 0.002]
+
+Csa_l = (2/3)*Csa_vec/1333*1000;
+Csa_u = (1/3)*Csa_vec/1333*1000;
+%Csa_l = [(2/3)*(0.0012/1333)*1000 (2/3)*(0.0018/1333)*1000 (2/3)*(0.002/1333)*1000];
+%Csa_u = [(1/3)*(0.0012/1333)*1000 (1/3)*(0.0018/1333)*1000 (1/3)*(0.002/1333)*1000]; 
 Csv_l = (2/3)*(0.09/1333)*1000;
 Csv_u = (1/3)*(0.09/1333)*1000;
 Cs_l = Csa_l + Csv_l;
 
-Cpa = (0.00412/1333)*1000; 
-Cpv = (0.01/1333)*1000; 
+Cpa = (0.00412/1333)*1000;  %compliance pulm art
+Cpv = (0.01/1333)*1000;     %compliance pulm vein
 Cp = Cpa + Cpv;
-Vtotal = 3.7*1000; %3.7 cm^3
+Vtotal = 3.7*1000; %3.7 L * 1000 -> cm^3 
 
 
 Gs = 1/Rs_u + 1/Rs_l; 
@@ -43,7 +48,7 @@ Tp = Rp*Cpa;
 Csa = Csa_u+Csa_l;
 
 %P_thorax = linspace(-4*1333,3*1333, 8); %mmHg * dynes/(mmHg*cm^2)
-P_thorax = -4.3*1333;
+P_thorax = -4.3*1333; %mm Hg -> dynes/cm^2 (P=F/A)
 P_RA = P_thorax+dP_RA;
 
 Vd_total_vec = zeros(1,length(G)); 
@@ -200,8 +205,8 @@ sol_Vd_Csa_G = sol_Vd_Csa_G/1000;
 % 
 % 
 % 
-% h3=figure(103)
-% clf(103)
+h3=figure(103)
+clf(103)
 % for i = 1:length(P_thorax)
 % 
 % plot(G,sol_Ppa_Pthorax_G(i,:))
@@ -209,26 +214,40 @@ sol_Vd_Csa_G = sol_Vd_Csa_G/1000;
 % ylabel('Pulmonary Arterial Pressure (mmHg)', 'interpreter', 'latex')
 % hold on
 % end
-% % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
-% % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
-% figure(1)
-% for i = 1:length(Csa)
-%     plot(G, sol_F_Csa_G)
-%     xlabel('G')
-%     ylabel('Heart Rate (per minute)')
-%     hold on
-% end
+% xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
+% xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
+
+    figure(i)
+    hold on
+for i = 1:length(Csa)
+
+    plot(G, sol_F_Csa_G)
+    xlabel('G')
+    ylabel('Heart Rate (per minute)')
+    hold on
+end
 
 % xticks([1*9.80 2*9.80 3*9.80 4*9.80 5*9.80 6*9.80 7*9.80 8*9.80 9*9.80 10*9.80])
 % % xticklabels({'g','2g','3g','4g','5g','6g','7g', '8g', '9g', '10g'})
 
-figure(1)
+colorvec={[0,0,0]+0.8, [0,0,0]+0.4, [0,0,0], [0,0,0]+0.4, [0,0,0]+0.8}
+
+figure(100)
 for i = 1:length(Csa)
-    plot(G, sol_Vd_Csa_G(i,:), 'linewidth', 2, 'Color', [0, 0, 0] + 0.25*i)
+% <<<<<<< HEAD:matlab_controller_2021/varyG_conventional_units.m
+%     plot(G, sol_Vd_Csa_G(i,:), 'linewidth', 2, 'Color', [0, 0, 0] + 0.25*i)
+% =======
+    plot(G, sol_Vd_Csa_G(i,:), 'LineWidth', 2, 'Color', colorvec{i})
+%>>>>>>> 16da254 (made plots with varying G and Csa in grayscale for AsMA presentation May 2022):matlab_controller_2021/varyGandCsa_conventional_units.m
     xlabel('G')
     ylabel('Reserve Volume (L)')
-    title('G tolerance varying arterial compliance')
+    title('Varying Arterial Compliance')
     hold on
 end
-legend('Csa = 1.2 mL/mmHg','Csa = 1.8 mL/mmHg','Csa = 2.0 mL/mmHg')
-set(gca, 'fontSize', 18)
+%<<<<<<< HEAD:matlab_controller_2021/varyG_conventional_units.m
+%legend('Csa = 1.2 mL/mmHg','Csa = 1.8 mL/mmHg','Csa = 2.0 mL/mmHg')
+%set(gca, 'fontSize', 18)
+%=======
+legend('58% Csa_{>65}', '80% Csa_{>65}', 'Csa_{>65} = 1.2 mL/mmHg','Csa_{21-29} = 1.8 mL/mmHg','Csa_{50-64} = 2.0 mL/mmHg')
+set(gca, 'FontSize', 18)
+%>>>>>>> 16da254 (made plots with varying G and Csa in grayscale for AsMA presentation May 2022):matlab_controller_2021/varyGandCsa_conventional_units.m

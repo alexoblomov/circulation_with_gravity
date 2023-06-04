@@ -50,7 +50,7 @@ G = [980:980:2*980]; %cm/s^2
 
 Vd_total_vec = zeros(1,length(P_thorax)); 
 sol_Vd_G_Pthorax = zeros(length(G), length(P_thorax)); 
-valid_dPRA_vs_G_Pthorax = zeros(length(G), length(Pthorax));
+valid_dPRA_vs_G_Pthorax = zeros(length(G), length(P_thorax));
 
 
 for i = 1:length(G)
