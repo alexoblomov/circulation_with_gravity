@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from parameters import *
 mpl.rcParams['mathtext.fontset'] = 'cm'
-
-G = np.linspace(g_earth,7*980, 3000)
+from matplotlib.lines import Line2D
+G = np.linspace(g_earth,10*980, 3000)
 
 Vtotal = np.linspace(3, 8, 6)
 Vtotal = Vtotal*1000
@@ -73,25 +73,19 @@ for j in range(len(Vtotal)):
          
             cases[j, i] = 2
         elif P_thorax[j] >= rho * G[i] * Hu - dP_RA:
-            # print("entered case III")
+            
             Vd_total = Vtotal[j] - Cp * (C_RVD / C_LVD) * dP_RA - \
                     (Tp*Gs + Csa_l+Csa_u)*Psa_u_star \
                     - (Tp*Gs + Csa_l - Csv_u) * rho * G[i] * Hu \
                     - (Csa_l+Csv_l) * rho * G[i] * (-Hl) \
                     - (Csv_l+Csv_u - Tp*Gs)* (P_thorax + dP_RA)
-
             Psv_l = P_thorax + dP_RA + rho * G[i] * (- Hl)
             Psv_u = P_thorax + dP_RA - rho * G[i] * Hu
             Psa_l = Psa_u_star + rho * G[i] * (Hu - Hl)
             Qs_u = (Psa_u_star - Psv_u) / Rs_u
-            Qs_u_also = (Psa_u_star + rho*G[i]*Hu - P_thorax - dP_RA)/Rs_u
-           
-
-          
+            Qs_u_also = (Psa_u_star + rho*G[i]*Hu - P_thorax - dP_RA)/Rs_u   
             Qs_l = (Psa_l - Psv_l) / Rs_l
-            Qs_l_also = (Psa_u_star + rho*G[i]*Hu - P_thorax - dP_RA)/Rs_l
-          
-
+            Qs_l_also = (Psa_u_star + rho*G[i]*Hu - P_thorax - dP_RA)/Rs_l          
             Q = Qs_u + Qs_l
             F = Q / (C_RVD * (dP_RA))
             Ppv = P_thorax + (C_RVD / C_LVD) * dP_RA
@@ -126,52 +120,43 @@ Vtotal_titles = [Vtotal_string + " $=$ " + str(vtot/1000) + r" $\mathrm{L}$" for
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 # Define shades of red and yellow
-red_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright red) to 0 (dark red)
-yellow_shades = np.linspace(1, 0, len(Vtotal))  # From 1 (bright yellow) to 0 (dark yellow)
+red_shades = np.linspace(1, 0, len(Vtotal) + 1)  # From 1 (bright red) to 0 (dark red)
+yellow_shades = np.linspace(0.8, 0, len(Vtotal) + 1)  # From 1 (bright yellow) to 0 (dark yellow)
 
 # Convert shades to colors in the colormap
 cmap = plt.cm.get_cmap(color_map)  # Get the colormap
 line_colors = [cmap(shade) for shade in np.concatenate([red_shades, yellow_shades])]
+line_style = ['--', ':', '-']
 
-plt.figure()
-plt.title(r'$\mathrm{Heart}$ $\mathrm{Rate}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$')
-plt.xlabel(r"$g$ $\mathrm{multiples}$")
-plt.ylabel(r"$F$ $(\mathrm{beats/min})$")
+
+fig, ax = plt.subplots() 
 for n, plt_title in enumerate(Vtotal_titles):
-    # Create a copy of the data to avoid overwriting
-    F_values = np.copy(sol_F_Vtotal_G[n, :])
-    plt.plot(G, F_values, color=line_colors[n])
-    
-plt.legend(Vtotal_titles)
-plt.grid(True)
-plt.savefig("figures/varyVtotal_F_G", bbox_inches='tight', dpi=300)
-plt.figure(figsize=(15, 12))
-plt.subplots_adjust(hspace=0.5)
-plt.suptitle(r"$\mathrm{Reserve}$ $\mathrm{volume}$ v. g", fontsize=18, y=0.95)
-
-
-
-plt.figure()
-for n, plt_title in enumerate(Vtotal_titles):
-    # add a new subplot iteratively
-    # filter df and plot ticker on the new subplot axis
-    idx_case_1 = cases == 1
-    idx_case_2 = cases == 2
-    idx_case_3 = cases == 3
-    plt.plot(G, sol_Vd_Vtotal_G[n, :], color=line_colors[n])
-    plt.title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$')
+    case_1_indices = np.where(cases[n,:] == 1)
+    case_2_indices = np.where(cases[n,:] == 2)
+    case_3_indices = np.where(cases[n,:] == 3)
+    ax.plot(G[case_1_indices], sol_Vd_Vtotal_G[n, case_1_indices[0]], color=line_colors[len(Vtotal) - n], linestyle = line_style[0])
+    ax.plot(G[case_2_indices], sol_Vd_Vtotal_G[n, case_2_indices[0]], color=line_colors[len(Vtotal) - n], linestyle = line_style[1])
+    ax.plot(G[case_3_indices], sol_Vd_Vtotal_G[n, case_3_indices[0]], color=line_colors[len(Vtotal) - n], linestyle = line_style[2], label = Vtotal_string + r" $=$ " + fr'{Vtotal[n]/1000}' + L)
+    ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$')
     # ax.get_legend().remove()
-    plt.xlabel(r"$g$ $\mathrm{multiples}$")
-    plt.ylabel(r"$V_{\mathrm{total}}^0$ $(\mathrm{L})$")
+    ax.set_xlabel(r"$g$ $\mathrm{multiple}$")
+    ax.set_ylabel(r"$V_{\mathrm{total}}^0$ $(\mathrm{L})$")
     
-plt.legend(Vtotal_titles)
+color_legend = ax.legend(ncol=2, loc = 'upper right')
+legend_handles = [
+    Line2D([], [], linestyle='dashed', color='maroon', label=r'$\mathrm{Case}$ $1$'),
+    Line2D([], [], linestyle='dotted', color='maroon', label=r'$\mathrm{Case}$ $2$'),
+    Line2D([], [], linestyle='solid', color='maroon', label=r'$\mathrm{Case}$ $3$')
+]
+linestyle_legend = ax.legend(handles = legend_handles, loc = 'center right')
+ax.add_artist(color_legend)
 plt.grid(True)
-plt.savefig("figures/varyVtotal_V0_G", bbox_inches='tight', dpi=300)
+plt.savefig("steady_state/figures/idealized_controller/varyVtotal_V0_G", bbox_inches='tight', dpi=300)
 
 plt.figure()
 plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$")
 plt.xlabel(r"$V_\mathrm{total}$ $\mathrm{(L)}$")
-plt.ylabel(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $(g$ $\mathrm{multiples})$")
+plt.ylabel(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $(g$ $\mathrm{multiple})$")
 
 for i in range(len(Vtotal)):
     min_Vd_total = np.nanmin(sol_Vd_Vtotal_G[i, :])
@@ -180,11 +165,11 @@ for i in range(len(Vtotal)):
     else:
         min_Vd_total_index = np.nanargmin(sol_Vd_Vtotal_G[i, :])
         g_intercept = G[min_Vd_total_index]
-    plt.plot(Vtotal[i] / 1000, g_intercept, 'o-', markersize=6, color=line_colors[i])
+    plt.plot(Vtotal[i] / 1000, g_intercept, 'o-', markersize=6, color=line_colors[len(Vtotal) - i])
 # Enable LaTeX rendering
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.grid(True)
 # Specify the file path for saving the figure
-plt.savefig("figures/varyVtotal_gtol_plot.png", bbox_inches='tight', dpi=300)
+plt.savefig("steady_state/figures/idealized_controller/varyVtotal_gtol_plot.png", bbox_inches='tight', dpi=300)
 
