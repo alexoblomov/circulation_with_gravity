@@ -40,7 +40,7 @@ for i in range(len(Hu_values)):
             elif P_thorax >= rho * G[k] * Hu_values[i] - dP_RA:
                 Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
                            - (Tp * Gs + Csa_l + Csa_u) * Psa_u_star \
-                           - (Tp * Gs_l + Csa_l - Csv_u) * rho * G[k] * Hu_values[i] \
+                           - (Tp * Gs + Csa_l - Csv_u) * rho * G[k] * Hu_values[i] \
                            - (Csa_l + Csv_l) * rho * G[k] * (-Hl_values[j]) \
                            - (Csv_l + Csv_u - Tp * Gs) * (P_thorax + dP_RA)
 
@@ -52,9 +52,9 @@ for i in range(len(Hu_values)):
         # Find G tolerance value
         zero_indices = np.where(Vd_total_vec <= 0)[0]
         if len(zero_indices) > 0:
-            G_tolerance[i, j] = G[zero_indices[0]] / 1000
+            G_tolerance[i, j] = G[zero_indices[0]] / 100 / 9.8
         else:
-            G_tolerance[i, j] = G[np.argmin(np.abs(Vd_total_vec))] / 1000
+            G_tolerance[i, j] = G[np.argmin(np.abs(Vd_total_vec))] / 100 / 9.8
 
 # Plotting the heatmap
 plt.figure()
@@ -64,7 +64,7 @@ heatmap = plt.imshow(G_tolerance, cmap=color_map, aspect='auto', origin='lower')
 
 x_tick_indices = np.linspace(0, len(Hl_values) - 1, 5, dtype=int)
 y_tick_indices = np.linspace(0, len(Hu_values) - 1, 5, dtype=int)
-x_tick_labels = [f'{Hl_values[i]:.2f}' for i in x_tick_indices]
+x_tick_labels = [f'{-Hl_values[i]:.2f}' for i in x_tick_indices]
 y_tick_labels = [f'{Hu_values[i]:.2f}' for i in y_tick_indices]
 
 plt.xticks(x_tick_indices, [float(label) for label in x_tick_labels])
@@ -74,8 +74,8 @@ plt.xlabel(r'$H_{\mathrm{l}}$ $\mathrm{(cm)}$')
 plt.ylabel(r'$H_{\mathrm{u}}$ $\mathrm{(cm)}$')
 plt.title(r'$\mathrm{+Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Height}$ $\mathrm{Ratio}$')
 plt.tick_params(axis='both')  # Set tick label font size
-cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{multiples}$")
+cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{multiple}$")
 
 
 plt.grid(False)
-plt.savefig('figures/varyH_gtol', bbox_inches='tight', dpi=300)
+plt.savefig('figures/idealized_controller/varyH_gtol', bbox_inches='tight', dpi=300)
