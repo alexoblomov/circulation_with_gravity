@@ -45,6 +45,8 @@ for i in range(dx):
 
 # conversions:
 gtol_vs_CsaU_vs_CsaL = gtol_vs_CsaU_vs_CsaL / 100 / (g_earth / 100)
+Csa_u_range = Csa_u_range * 1333 / 1000 # ml/mmHg
+Csa_l_range = Csa_l_range * 1333 / 1000 # ml/mmHg
 Csa_u_range = np.around(Csa_u_range, 6) # ml/mmHg
 Csa_l_range = np.around(Csa_l_range, 6) # ml/mmHg
 
@@ -76,6 +78,6 @@ plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
          rotation_mode="anchor")
 fig.tight_layout(pad=2  )
 
-plt.ylabel('upper compliance', fontsize = 12)
-plt.xlabel('lower compliance', fontsize = 12)
+plt.ylabel('upper compliance (ml/mmHg)', fontsize = 12)
+plt.xlabel('lower compliance (ml/mmHg)', fontsize = 12)
 plt.savefig('compliance_gtol_height_factor.png')

@@ -15,14 +15,12 @@ Psa_u_star = 100 * 1333
 
 Psa_u = Psa_u_star
 dP_RA = 2 * 1333
-height = 167.64
 
 # 1/2 factor to average over compartment height (bernoulli's principle - 
 # fluid dynamics)
 
 Hu_patient = 0.5*32 # (heart 2 eyeball)
 Hl_patient = -0.5*42 # (heart 2 seat)
-lumped_height = Hu_patient + (-Hl_patient)
 
 Hu_factor = 1/3
 Hl_factor = 2/3
