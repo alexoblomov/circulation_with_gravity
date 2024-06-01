@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from parameters import *
-mpl.rcParams['mathtext.fontset'] = 'cm'
+# mpl.rcParams['mathtext.fontset'] = 'cm'
 from matplotlib.lines import Line2D
 G = np.linspace(g_earth,10*980, 3000)
 
@@ -124,7 +124,7 @@ red_shades = np.linspace(1, 0, len(Vtotal) + 1)  # From 1 (bright red) to 0 (dar
 yellow_shades = np.linspace(0.8, 0, len(Vtotal) + 1)  # From 1 (bright yellow) to 0 (dark yellow)
 
 # Convert shades to colors in the colormap
-cmap = plt.cm.get_cmap(color_map)  # Get the colormap
+cmap = plt.get_cmap(color_map)  # Get the colormap
 line_colors = [cmap(shade) for shade in np.concatenate([red_shades, yellow_shades])]
 line_style = ['--', ':', '-']
 
