@@ -21,7 +21,7 @@ G_tolerance = np.zeros((len(Hu_values), len(Hl_values)))
 # Loop over Hu and Hl values
 for i in range(len(Hu_values)):
     for j in range(len(Hl_values)):
-        G = np.linspace(g_earth, 10 * 980, 3000)
+        G = np.linspace(g_earth, 10 * 980, 1000)
 
         # Initialize Vd_total vector
         Vd_total_vec = np.empty(len(G))
@@ -58,8 +58,7 @@ for i in range(len(Hu_values)):
 
 # Plotting the heatmap
 plt.figure()
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+
 heatmap = plt.imshow(G_tolerance, cmap=color_map, aspect='auto', origin='lower')
 
 x_tick_indices = np.linspace(0, len(Hl_values) - 1, 5, dtype=int)
@@ -78,4 +77,4 @@ cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{multiple}$")
 
 
 plt.grid(False)
-plt.savefig('figures/idealized_controller/varyH_gtol', bbox_inches='tight', dpi=300)
+plt.savefig('varyH_gtol', bbox_inches='tight', dpi=300)

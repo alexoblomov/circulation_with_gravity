@@ -117,8 +117,8 @@ Vtotal_string = r'$V_\mathrm{total}$'
 L = r'$\mathrm{L}$'
 
 Vtotal_titles = [Vtotal_string + " $=$ " + str(vtot/1000) + r" $\mathrm{L}$" for vtot in Vtotal]
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif')
 # Define shades of red and yellow
 red_shades = np.linspace(1, 0, len(Vtotal) + 1)  # From 1 (bright red) to 0 (dark red)
 yellow_shades = np.linspace(0.8, 0, len(Vtotal) + 1)  # From 1 (bright yellow) to 0 (dark yellow)
@@ -151,7 +151,7 @@ legend_handles = [
 linestyle_legend = ax.legend(handles = legend_handles, loc = 'center right')
 ax.add_artist(color_legend)
 plt.grid(True)
-plt.savefig("steady_state/figures/idealized_controller/varyVtotal_V0_G", bbox_inches='tight', dpi=300)
+plt.savefig("varyVtotal_V0_G", bbox_inches='tight', dpi=300)
 
 plt.figure()
 plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Total}$ $\mathrm{Volume}$")
@@ -166,10 +166,9 @@ for i in range(len(Vtotal)):
         min_Vd_total_index = np.nanargmin(sol_Vd_Vtotal_G[i, :])
         g_intercept = G[min_Vd_total_index]
     plt.plot(Vtotal[i] / 1000, g_intercept, 'o-', markersize=6, color=line_colors[len(Vtotal) - i])
-# Enable LaTeX rendering
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+
 plt.grid(True)
+
 # Specify the file path for saving the figure
-plt.savefig("steady_state/figures/idealized_controller/varyVtotal_gtol_plot.png", bbox_inches='tight', dpi=300)
+plt.savefig("varyVtotal_gtol_plot.png", bbox_inches='tight', dpi=300)
 

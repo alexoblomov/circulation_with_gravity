@@ -60,8 +60,8 @@ for i in range(len(Csa_u)):
 
 # Plotting the heatmap
 plt.figure()
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif')
 heatmap = plt.imshow(G_tolerance, cmap=color_map, aspect='auto', origin='lower')
 
 x_tick_indices = np.linspace(0, len(Csa_l) - 1 , 5, dtype=int)
@@ -76,8 +76,8 @@ plt.xlabel(r'$C_{\mathrm{sa}}^{\mathrm{l}}$ $\mathrm{(mL/mmHg)}$')
 plt.ylabel(r'$C_{\mathrm{sa}}^{\mathrm{u}}$ $\mathrm{(mL/mmHg)}$')
 plt.title(r'$\mathrm{+Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Arterial}$ $\mathrm{Compliances}$')
 plt.tick_params(axis='both')  # Set tick label font 
-cbar = plt.colorbar(heatmap, label=r"$g$ $\mathrm{multiple}$")
+cbar = plt.colorbar(heatmap, label= "g multiple")
 
 
 plt.grid(False)
-plt.savefig('figures/idealized_controller/varyCsa_gtol', bbox_inches='tight', dpi=300)
+plt.savefig('varyCsa_gtol', bbox_inches='tight', dpi=300)
