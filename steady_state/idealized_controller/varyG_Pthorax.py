@@ -9,11 +9,7 @@ from matplotlib import rc
 from parameters import *
 mpl.rcParams['mathtext.fontset'] = 'cm'
 from matplotlib.lines import Line2D
-# Enable LaTeX rendering
-mpl.rcParams['text.usetex'] = True
 
-# Set the font family to serif
-mpl.rcParams['font.family'] = 'serif'
 
 G = np.linspace(g_earth,4*980, 300)
 
@@ -159,7 +155,7 @@ ax.set_title(r'$\mathrm{Reserve}$ $\mathrm{Volume}$ $\mathrm{v.}$ $\mathrm{Accel
 ax.tick_params(axis='both', labelsize=10)  # Set tick label font size
 plt.rc('font', family='serif')  # Set font family to use LaTeX font
 plt.grid(True)
-plt.savefig('steady_state/figures/idealized_controller/varyPthorax_Vd_G', bbox_inches='tight', dpi=300)
+plt.savefig('varyPthorax_Vd_G', bbox_inches='tight', dpi=300)
 
 # Plotting G against F for different P_thorax values
 fig, ax = plt.subplots()
@@ -178,10 +174,10 @@ ax.set_ylabel(r'$F$ $\mathrm{(beats/min)}$')
 ax.set_title(r'$\mathrm{Heart}$ $\mathrm{Rate}$ $\mathrm{v.}$ $\mathrm{Acceleration}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressures}$')
 
 ax.set_xlim(1,4)
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+# plt.rc('text', usetex=True)
+# plt.rc('font', family='serif')
 plt.grid(True)
-plt.savefig('steady_state/figures/idealized_controller/varyPthorax_F_G', bbox_inches='tight', dpi=300)
+plt.savefig('varyPthorax_F_G', bbox_inches='tight', dpi=300)
 
 
 
@@ -189,6 +185,7 @@ plt.figure()
 plt.title(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $\mathrm{Varying}$ $\mathrm{Intrathoracic}$ $\mathrm{Pressure}$")
 plt.xlabel(r"$P_\mathrm{thorax}$ $\mathrm{(mmHg)}$")
 plt.ylabel(r"$+\mathrm{Gz}$ $\mathrm{Tolerance}$ $(g$ $\mathrm{multiples})$")
+
 for i in range(len(P_thorax)):
     min_Vd_total = np.nanmin(sol_Vd_Pthorax_G[i, :])
     if np.isnan(min_Vd_total):
@@ -197,9 +194,8 @@ for i in range(len(P_thorax)):
         min_Vd_total_index = np.nanargmin(sol_Vd_Pthorax_G[i, :])
         g_intercept = G[min_Vd_total_index]
     plt.plot(P_thorax[i] / 1333, g_intercept, 'o-', markersize=6, color=line_colors[len(P_thorax)-i])
-# Enable LaTeX rendering
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+
+
 plt.grid(True)
-plt.savefig('steady_state/figures/idealized_controller/varyPthorax_gtol_plot', bbox_inches='tight', dpi=300)
+plt.savefig('varyPthorax_gtol_plot', bbox_inches='tight', dpi=300)
 
