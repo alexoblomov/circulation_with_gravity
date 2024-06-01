@@ -36,9 +36,7 @@ python dynamic_model.py
 
 
 
-HOW TO RUN CODE IN WINDOWS
-
-HOW TO USE ON WINDOWS:
+HOW TO SETUP IN WINDOWS
 
 1. Clone the repository into Git Bash:
 ```
