@@ -8,7 +8,7 @@ To run the code:
 
 ```
 git clone https://github.com/alexoblomov/circulation_with_gravity
-cd circulation with gravity
+cd circulation_with_gravity
 ```
 
 create a python virtual environment (tested on ubuntu 18.04.6)
@@ -16,16 +16,22 @@ create a python virtual environment (tested on ubuntu 18.04.6)
 ```
 pyenv virtualenv 3.9.0 circulation_model
 pyenv activate circulation_model
+```
+
+Install the requirements
+
+```
 pip install -r requirements.txt
 
 ```
 checkout the version of the model you want to run:
-steady state model is on the main branch in the steady-state folder
+e.g. steady state model is on the main branch in the steady-state folder
 
 ```
 cd ../steady_state/
 python varyG_conventional_units.py 
 ```
+for plots used in the paper, checkout the steady_state_plots branch
 
 to run the dynamic model (work in progress)
 ```
@@ -36,7 +42,7 @@ python dynamic_model.py
 
 
 
-HOW TO SETUP IN WINDOWS
+# HOW TO SETUP IN WINDOWS
 
 1. Clone the repository into Git Bash:
 ```
