@@ -1,5 +1,5 @@
 """
-Purpose : simulate ode model
+Purpose : simulate ode model with F controlled and Vsv0 held constant
 
 """
 import numpy as np
@@ -21,7 +21,6 @@ fname = path / "Run_1_G.csv"
 T, g_range = import_g_profile(fname)
 
 end_timestep = 7498
-# end_timestep = 1000
 T = T[:end_timestep]
 g_range = g_range[:end_timestep]
 
@@ -62,6 +61,7 @@ Psv_u = np.zeros(n_timesteps) # Psv_u[0] = 15 * 1333
 Psv_l = np.zeros(n_timesteps) #; Psv_l[0] = 59 * 1333
 Psa_u = np.zeros(n_timesteps) #; Psa_u[0] = 140 * 1333
 Psa_l = np.zeros(n_timesteps) #; Psa_l[0] = 104 * 1333
+F = np.zeros(n_timesteps) #; F[0] = 80/60 # set by controller inside loop
 
 # TODO consider moving to parameters.py
 dP_RA = np.zeros(n_timesteps)
@@ -83,9 +83,9 @@ Vsv[0] = init_Vsv
 Vsa0 = np.ones(n_timesteps) * (1-pct_venous )* VT0_steady_state_cntrl
 # compare with:
 Vsv0 = np.ones(n_timesteps) * pct_venous * VT0_steady_state_cntrl
+# Vsv0 =  np.zeros(n_timesteps)
+# Vsv0[0] = pct_venous * VT0_steady_state_cntrl
 
-F = get_linear_heart_rate(Psa_u_star, F_star, F_min, Psa_u_star,
-        P_sa_u_min) * np.ones(n_timesteps)
 
 for t in range(n_timesteps):
     g = g_range[t]
@@ -129,9 +129,20 @@ for t in range(n_timesteps):
     
 
     dPsa = (Psa_u[t] - Psa_u_star)
-
+    if control_type == "linear":
+        F[t] = get_linear_heart_rate(dPsa, F_star, F_min, Psa_u_star,
+                                        P_sa_u_min)
+        # fit curve through max points and starred points doesn't work.
+        # maybe simple point slope rewrite
+        # F[t] = get_linear_heart_rate(dPsa, F_star, F_max, Psa_u_star,
+        # P_sa_u_max) # not work
+    elif control_type == "exp":
+        F[t] = get_exp_heart_rate(dPsa, Psa_u_star, F_star)
     if t > 0:
         Vsv0[t] = get_reserve_venous_volume(dPsa, Psa_u_star, Vsv0_star)
+    
+    # Rs_l[t] = get_lower_peripheral_resistance(dPsa, Psa_u_star, Rs_l_star, 
+    #                             Rs_l_min, P_sa_u_min)
     
     print("F ", F[t])
     Q[t] = C_RVD * F[t]*(P_ra[t] - P_thorax[t])
@@ -180,7 +191,7 @@ ax8 = fig.add_subplot(gs[2, 1])
 ax9 = fig.add_subplot(gs[2, 2])
 
 
-start = 150
+start = 0
 ax1.plot(T[start:], Vsa[start:-1], label='Vsa')
 ax1.set_ylabel("ml")
 # ax1.set_title("Vsa")
@@ -208,17 +219,17 @@ ax7.plot(T, F*60, label='F')
 ax7.set_ylabel("B/min")
 ax7.legend()
 
-ax8.plot(T[start:], g_range[start:], label='g')
+ax8.plot(T, g_range, label='g')
 ax8.set_ylabel("x G")
 ax8.legend()
 
-ax9.plot(T[start:], Vsv0[start:], label='Vsv0')
+ax9.plot(T, Vsv0, label='Vsv0')
 ax9.set_ylabel("ml")
 ax9.legend()
 
 fig.tight_layout()
 
-title = 'varyG_Vsv0' +  control_type + '_control_dynamic_model.png'
+title = 'varyG_F_Vsv0' +  control_type + '_control_dynamic_model.png'
 plt.savefig(title)
 
 # p_range = np.linspace(0, P_sa_u_max)
