@@ -1,12 +1,12 @@
 import numpy as np
 
-def get_linear_heart_rate(dPsa, F_star, F_min, P_max, P_min):
+def get_linear_heart_rate(dPsa, F_star, F_min, P_star, P_min):
     """return a linear function of heart rate F in terms of pressure
 
     Args:
         F_star (_type_): maximum viable pressure for individual
         F_min (_type_): minimum viable pressure 
-        P_max (_type_): maximum viable upper (coronary) 
+        P_star (_type_): target / maximum viable upper (coronary) 
             arterial pressure for individual
         P_min (_type_): minimum viable upper (coronary) 
             arterial pressure for individual
@@ -24,7 +24,7 @@ def get_linear_heart_rate(dPsa, F_star, F_min, P_max, P_min):
     
     return F
 
-def get_exp_heart_rate(dPsa, Psa_star, F_star):
+def get_exp_heart_rate(dPsa, F_star, F_min, Psa_star):
     """returns new F
 
     Args:
@@ -36,6 +36,13 @@ def get_exp_heart_rate(dPsa, Psa_star, F_star):
     d = (F_star - np.exp(-Psa_star))
     # c = np.log(F_star - d) + Psa_star
     F = np.exp(-dPsa) + d
+
+    # if F > 200/60: 
+    #     print("max HR exceeded")
+    #     F = 200/60
+    # if F < F_min:
+    #     print("min viable HR")
+    #     F = F_min
 
     return F
 
