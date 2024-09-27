@@ -1,5 +1,5 @@
 """
-Purpose : simulate ode model with F controlled and Vsv0 held constant
+Purpose : simulate ode model with Vsv0  held constant
 
 """
 import numpy as np
