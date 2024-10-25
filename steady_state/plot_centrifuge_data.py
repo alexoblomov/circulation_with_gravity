@@ -44,3 +44,27 @@ gz_values[0][8:11] *= 3.5
 
 hr_values = np.array([[73, 77, 63, 55, 64, 78, 77, 140, 100, 112, 92]])
 gz_relaxed_table = np.vstack((gz_values, hr_values))
+
+# as 1D arrays
+# can add in the two blue data points 62 and 65 at idle (gz=1)
+gz_list = np.ones((11))
+gz_list[6:8] *= 2.2
+gz_list[8:11] *= 3.5
+hr_list = np.array([73, 77, 63, 55, 64, 78, 77, 140, 100, 112, 92])
+
+plt.plot(gz_list, hr_list, 'ro')
+plt.axis((0, 6, 0, 200))
+plt.savefig("relaxed_gz_HR_centrifuge_data.png")
+
+# plot hook only 
+# 3 data points
+
+gz_hook = np.ones((3)) * 3.5
+hr_hook = np.array([142, 152, 126])
+
+# currently adds all data points to plot
+# may want to clear relaxed hr and have hook only on the plot
+
+plt.plot(gz_hook, hr_hook, 'bo')
+plt.axis((0, 6, 0, 200))
+plt.savefig("hook_maneuver_gz_HR_centrifuge_data.png")
