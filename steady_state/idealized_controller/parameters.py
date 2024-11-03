@@ -32,6 +32,7 @@ rho = 1
 
 g_earth = 980
 
+# resistance of systemic arteries
 Rs = (16.49) * 1333 / (1000 / 60)
 
 Gs = 1 / Rs
@@ -39,6 +40,8 @@ Gs_u = Hu_factor * Gs
 Gs_l = Hl_factor * Gs
 Rs_l = 1 / Gs_l
 Rs_u = 1 / Gs_u
+
+# resistance of pulmary arteries
 Rp = (1.61 * 1333) / (1000 / 60)
 
 C_RVD = (0.035 / 1333) * 1000
