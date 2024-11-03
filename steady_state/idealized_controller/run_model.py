@@ -91,6 +91,6 @@ sol_Vd_Vtotal_G = Vd_total_vec / 1000
 plt.figure()
 
 plt.plot(G, sol_F_Vtotal_G)
-plt.axis((0, 6, 0, 200))
+plt.axis((1, 6, 40, 200))
 
 plt.savefig("F_vs_g_tolerance.png")
