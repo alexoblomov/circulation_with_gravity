@@ -87,9 +87,10 @@ G = G / 100 / (g_earth / 100)
 sol_F_Vtotal_G = F_vec * 60
 sol_Vd_Vtotal_G = Vd_total_vec / 1000
 
-breakpoint()
+# breakpoint()
 plt.figure()
 
+plt.plot(G, sol_F_Vtotal_G)
+plt.axis((0, 6, 0, 200))
 
-plt.plot(G, G_tolerance)
-plt.save("g_vs_g_tolerance.png")
+plt.savefig("F_vs_g_tolerance.png")
