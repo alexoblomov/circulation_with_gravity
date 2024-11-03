@@ -54,7 +54,7 @@ hr_list = np.array([73, 77, 63, 55, 64, 78, 77, 100, 112, 92])
 
 fig = plt.figure()
 plt.plot(gz_list, hr_list, 'ro')
-plt.axis((1, 6, 40, 200))
+plt.axis((0, 4, 40, 200))
 plt.savefig("relaxed_gz_HR_centrifuge_data.png")
 
 # plot hook only 
@@ -67,5 +67,5 @@ hr_hook = np.array([142, 152, 126])
 # may want to clear relaxed hr and have hook only on the plot
 fig = plt.figure()
 plt.plot(gz_hook, hr_hook, 'bo')
-plt.axis((1, 6, 40, 200))
+plt.axis((0, 4, 40, 200))
 plt.savefig("hook_maneuver_gz_HR_centrifuge_data.png")
