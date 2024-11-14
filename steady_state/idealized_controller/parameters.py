@@ -48,20 +48,32 @@ C_RVD = (0.035 / 1333) * 1000
 
 C_LVD = (0.00583 / 1333) * 1000
 
-# ideally we want to remove h factor from compliances
-# -- but g tol will decrease once Cs_i increase
+
+# systemic compliances 
+
+# literature compliance is probably aortic compliance / diastolic compliance
+# and this may be the reason that subdividing works
+# if we increase the pressure, how much do the vessels stretch in the upper body and lower body
+# legs stretch more because there's more mileage of blood vessels there
+# AND there's more blood pooling there because of gravity
+# even if each individual vessel is the same level of stretchy, 
+# we're averaging over a whole column of fluid (upper and )
+
 Csa_l = Hl_factor * (0.00175 / 1333) * 1000 
 Csa_u = Hu_factor * (0.00175 / 1333) * 1000
 Csv_l = Hl_factor * (0.09 / 1333) * 1000 
 Csv_u = Hu_factor * (0.09 / 1333) * 1000 
 Cs_l = Csa_l + Csv_l
+Csa = Csa_l + Csa_u
+
+
+# pulmonary compliances
 Cpa = (0.00412 / 1333) * 1000
 Cpv = (0.01 / 1333) * 1000
 Cp = Cpa + Cpv
 Vtotal = 3.7 * 1000
 
-Csa = Csa_l + Csa_u
+
 # Gs = 1 / Rs_u + 1 / Rs_l
 Ts = Csa_u * Rs_u
-
 Tp = Rp * Cpa
