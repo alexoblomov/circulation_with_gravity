@@ -38,34 +38,39 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-gz_values = np.ones((1,10))
-gz_values[0][7] *= 2.2
-gz_values[0][7:10] *= 3.5
+def plot_centrifuge_data():
+    gz_values = np.ones((1,10))
+    gz_values[0][7] *= 2.2
+    gz_values[0][7:10] *= 3.5
 
-hr_values = np.array([[73, 77, 63, 55, 64, 78, 77, 100, 112, 92]])
-gz_relaxed_table = np.vstack((gz_values, hr_values))
+    hr_values = np.array([[73, 77, 63, 55, 64, 78, 77, 100, 112, 92]])
+    gz_relaxed_table = np.vstack((gz_values, hr_values))
 
-# as 1D arrays
-# can add in the two blue data points 62 and 65 at idle (gz=1)
-gz_list = np.ones((10))
-gz_list[6] *= 2.2
-gz_list[7:10] *= 3.5
-hr_list = np.array([73, 77, 63, 55, 64, 78, 77, 100, 112, 92])
+    # as 1D arrays
+    # can add in the two blue data points 62 and 65 at idle (gz=1)
+    gz_list = np.ones((10))
+    gz_list[6] *= 2.2
+    gz_list[7:10] *= 3.5
+    hr_list = np.array([73, 77, 63, 55, 64, 78, 77, 100, 112, 92])
 
-fig = plt.figure()
-plt.plot(gz_list, hr_list, 'ro')
-plt.axis((0, 4, 40, 200))
-plt.savefig("relaxed_gz_HR_centrifuge_data.png")
+    fig = plt.figure()
+    plt.plot(gz_list, hr_list, 'ro')
+    plt.axis((0, 4, 40, 200))
+    plt.savefig("relaxed_gz_HR_centrifuge_data.png")
 
-# plot hook only 
-# 3 data points
+    # plot hook only 
+    # 3 data points
 
-gz_hook = np.ones((3)) * 3.5
-hr_hook = np.array([142, 152, 126])
+    gz_hook = np.ones((3)) * 3.5
+    hr_hook = np.array([142, 152, 126])
 
-# currently adds all data points to plot
-# may want to clear relaxed hr and have hook only on the plot
-fig = plt.figure()
-plt.plot(gz_hook, hr_hook, 'bo')
-plt.axis((0, 4, 40, 200))
-plt.savefig("hook_maneuver_gz_HR_centrifuge_data.png")
+    # currently adds all data points to plot
+    # may want to clear relaxed hr and have hook only on the plot
+    fig = plt.figure()
+    plt.plot(gz_hook, hr_hook, 'bo')
+    plt.axis((0, 4, 40, 200))
+    plt.savefig("hook_maneuver_gz_HR_centrifuge_data.png")
+
+
+if __name__ == "__main__":
+    plot_centrifuge_data()
