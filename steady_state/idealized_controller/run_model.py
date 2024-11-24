@@ -15,7 +15,7 @@ def plot_F_vs_G_case_I():
     P_RA = P_thorax + dP_RA
 
     # Discretization
-    G = np.linspace(g_earth, 10 * 980, 100)
+    G = np.linspace(g_earth, 10 * 980, 1000)
 
     # Initialize array to store G tolerance values
     G_tolerance = np.zeros(len(G))
