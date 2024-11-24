@@ -53,10 +53,10 @@ def plot_centrifuge_data():
     gz_list[7:10] *= 3.5
     hr_list = np.array([73, 77, 63, 55, 64, 78, 77, 100, 112, 92])
 
-    fig = plt.figure()
-    plt.plot(gz_list, hr_list, 'ro')
-    plt.axis((0, 4, 40, 200))
-    plt.savefig("relaxed_gz_HR_centrifuge_data.png")
+    fig, ax = plt.subplots()
+    x = ax.plot(gz_list, hr_list, 'ro')
+    # plt.axis((0, 4, 40, 200))
+    # plt.savefig("relaxed_gz_HR_centrifuge_data.png")
 
     # plot hook only 
     # 3 data points
@@ -66,11 +66,12 @@ def plot_centrifuge_data():
 
     # currently adds all data points to plot
     # may want to clear relaxed hr and have hook only on the plot
-    fig = plt.figure()
-    plt.plot(gz_hook, hr_hook, 'bo')
-    plt.axis((0, 4, 40, 200))
-    plt.savefig("hook_maneuver_gz_HR_centrifuge_data.png")
+    # fig = plt.figure()
+    # plt.axis((0, 4, 40, 200))
+    # plt.plot(gz_hook, hr_hook, 'bo')
+    # plt.axis((0, 4, 40, 200))
+    # plt.savefig("hook_maneuver_gz_HR_centrifuge_data.png")
+    return (gz_list, hr_list)
 
-
-if __name__ == "__main__":
-    plot_centrifuge_data()
+# if __name__ == "__main__":
+#     plot_centrifuge_data()

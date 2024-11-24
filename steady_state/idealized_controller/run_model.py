@@ -6,10 +6,12 @@ import matplotlib as mpl
 mpl.rcParams['mathtext.fontset'] = 'cm'
 
 
-def main():
+def plot_F_vs_G_case_I():
 
     # Fix P_thorax to a single value
-    P_thorax = -4 * 1333
+    P_thorax = -4 * 1333 # for case I
+    # P_thorax = 5 * 1333 # for case II
+    # P_thorax = 11 * 1333 # for case III
     P_RA = P_thorax + dP_RA
 
     # Discretization
@@ -33,6 +35,7 @@ def main():
             
             # print(f'G is  {G[k]} Vd_total is  {Vd_total}')
         elif P_thorax > -dP_RA and P_thorax < rho * G[k] * Hu_patient - dP_RA:
+            print("case II")
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
                         - (Tp * Gs + Csa_u + Csa_l) * Psa_u_star \
                         - (Tp * Gs_l + Csa_l) * (rho * G[k] * Hu_patient) \
@@ -53,6 +56,7 @@ def main():
             F = Q / (C_RVD * (dP_RA))
 
         elif P_thorax >= rho * G[k] * Hu_patient - dP_RA:
+            print("case III")
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
                         - (Tp * Gs + Csa_l + Csa_u) * Psa_u_star \
                         - (Tp * Gs + Csa_l - Csv_u) * rho * G[k] * Hu_patient \
@@ -67,7 +71,7 @@ def main():
             Q = Qs_u + Qs_l
 
             F = Q / (C_RVD * (dP_RA))
-
+            print(f'g : {G[k]}, F : {F}')
         if Vd_total >= 0:
             Vd_total_vec[k] = Vd_total
             F_vec[k] = F
@@ -90,12 +94,13 @@ def main():
     sol_Vd_Vtotal_G = Vd_total_vec / 1000
 
     # breakpoint()
-    plt.figure()
+    fig, ax = plt.subplots()
 
     plt.plot(G, sol_F_Vtotal_G)
     plt.axis((0, 4, 40, 200))
 
-    plt.savefig("F_vs_g_tolerance.png")
+    plt.savefig("F_vs_g_tolerance_compliance.png")
+    return (G, sol_F_Vtotal_G)
 
 if __name__ == "__main__":
-    main()
+    x = plot_F_vs_G_case_I()

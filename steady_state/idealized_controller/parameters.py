@@ -59,10 +59,16 @@ C_LVD = (0.00583 / 1333) * 1000
 # even if each individual vessel is the same level of stretchy, 
 # we're averaging over a whole column of fluid (upper and )
 
-Csa_l = Hl_factor * (0.00175 / 1333) * 1000 
-Csa_u = Hu_factor * (0.00175 / 1333) * 1000
+# Csa_l = Hl_factor * (0.00175 / 1333) * 1000 
+# Csa_u = Hu_factor * (0.00175 / 1333) * 1000
+
 Csv_l = Hl_factor * (0.09 / 1333) * 1000 
 Csv_u = Hu_factor * (0.09 / 1333) * 1000 
+
+Csa_l = (0.000141 / 1333) * 1000
+Csa_u = Csa_l
+
+
 Cs_l = Csa_l + Csv_l
 Csa = Csa_l + Csa_u
 
