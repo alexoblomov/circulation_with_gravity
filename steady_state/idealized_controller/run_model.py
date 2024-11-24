@@ -34,7 +34,7 @@ def plot_F_vs_G_case_I():
             F = Q / (C_RVD * (P_RA - P_thorax))
             
             # print(f'G is  {G[k]} Vd_total is  {Vd_total}')
-        elif P_thorax > -dP_RA and P_thorax < rho * G[k] * Hu_patient - dP_RA:
+        elif P_thorax > -dP_RA and (P_thorax < rho * G[k] * Hu_patient - dP_RA):
             print("case II")
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
                         - (Tp * Gs + Csa_u + Csa_l) * Psa_u_star \
@@ -55,7 +55,7 @@ def plot_F_vs_G_case_I():
             
             F = Q / (C_RVD * (dP_RA))
 
-        elif P_thorax >= rho * G[k] * Hu_patient - dP_RA:
+        elif P_thorax >= (rho * G[k] * Hu_patient - dP_RA):
             print("case III")
             Vd_total = Vtotal - Cp * (C_RVD / C_LVD) * dP_RA \
                         - (Tp * Gs + Csa_l + Csa_u) * Psa_u_star \
@@ -71,7 +71,8 @@ def plot_F_vs_G_case_I():
             Q = Qs_u + Qs_l
 
             F = Q / (C_RVD * (dP_RA))
-            print(f'g : {G[k]}, F : {F}')
+            # print(f'g : {G[k]}, F : {F}')
+
         if Vd_total >= 0:
             Vd_total_vec[k] = Vd_total
             F_vec[k] = F
@@ -87,13 +88,14 @@ def plot_F_vs_G_case_I():
         G_tolerance = G[np.argmin(np.abs(Vd_total_vec))] / 100 / 9.8
 
     print(f'g tolerance is {G_tolerance}')
-
+    
     #conversions:
     G = G / 100 / (g_earth / 100)
     sol_F_Vtotal_G = F_vec * 60
     sol_Vd_Vtotal_G = Vd_total_vec / 1000
 
-    # breakpoint()
+    # print("HR values :", sol_F_Vtotal_G)
+
     fig, ax = plt.subplots()
 
     plt.plot(G, sol_F_Vtotal_G)
