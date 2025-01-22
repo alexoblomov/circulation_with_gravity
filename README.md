@@ -33,3 +33,4 @@ git checkout ode-model
 cd dynamic_model
 python dynamic_model.py
 ```
+This branch involves varying parameters from real participants in teh centrifuge to validate the outputs.
