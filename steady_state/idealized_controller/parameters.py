@@ -1,4 +1,6 @@
 """
+#in this branch, the parameters are changed to mimic different participants under
+*PSA_u_star, Hu and Hi_patient, and Vtotal
 
 Karen's parameters for the model
 
