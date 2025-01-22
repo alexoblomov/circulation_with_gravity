@@ -1,6 +1,7 @@
 """
 #in this branch, the parameters are changed to mimic different participants under
 *PSA_u_star, Hu and Hi_patient, and Vtotal
+#1/21/24- parameters are currently at that of the initial participant
 
 Karen's parameters for the model
 
@@ -23,7 +24,7 @@ dP_RA = 2 * 1333
 # 1/2 factor to average over compartment height (bernoulli's principle - 
 # fluid dynamics)
 
-Hu_patient = 0.5*32 # (heart 2 eyeball)
+Hu_patient = 0.5*31 # (heart 2 eyeball)
 Hl_patient = -0.5*42 # (heart 2 seat)
 lumped_height = Hu_patient + (-Hl_patient)
 
