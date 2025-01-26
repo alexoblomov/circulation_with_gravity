@@ -31,8 +31,19 @@
     look up virgin galactic 
     winged vehicles 1 and 2 are different planes
 
-    ultrasound on all data plot : relaxed , regular profile (non winged vehicle)
-
+ #   ultrasound on all data plot : relaxed , regular profile (non winged vehicle)
+ # when running the below participants- parameters file was adjusted appropriately for Hu, Hi, and V total
+ # values have been returned back to the original participant for saving
+ #
+# Initial participant HR values 1Gz: 73,77,63,55,64,78; 2.2Gz: 77; 3.5Gz 100, 112,92
+# participant #2 HR values 1Gz: 108, 114, 103, 120, 93, 96, 91, 95; 2.2Gz: 120; 3.5Gz 142
+# participant #3 HR values 1Gz: 90, 92, 103, 120, 120, 93, 96, 91; 2.2Gz: 122; 3.5Gz: 142
+# participant #4 HR values 1Gz, 98, 100, 96, 90, 98, 100, 100, 85; 2.2Gz:108, 3.5Gz: 152
+# participant #5 HR values 1Gz: 82, 91, 90, 82, 82, 90, 80, 87; 2.2Gz: 94; 3.5Gz: 109
+# participant #6 HR values 1Gz: 92, 89, 84, 83, 91, 75, 110, 76; 2.2Gz: 117; 3.5Gz: 139
+# participant #7 HR values 1Gz: 98, 86, 110, 94; 2.2 Gz: 124, 122, 138; 3.5Gz: 138, 152, 166
+# participant #8 HR values 1Gz: 90, 102, 110; 2.2Gz: 120; 3.5Gz: 125, 110, 110
+# participant #9 HR values 1Gz: 125, 125, 130, 124; 2.2Gz: 135; 3.5Gz: 155, 155
 """
 
 import numpy as np
